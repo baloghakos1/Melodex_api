@@ -124,9 +124,14 @@ class MemberApiController extends Controller
             'image' => 'nullable|string'
         ]);
 
-        $product = Member::findOrFail($id);
-        $product->update($request->all());
-        return response()->json(['product' => $product]);
+        $member = Member::find($id);
+
+        if (!$member) {
+            return response()->json(['message' => 'Not found!'], 404);
+        }
+
+        $member->update($request->all());
+        return response()->json(['product' => $member]);
     }
 
     /**
@@ -142,14 +147,19 @@ class MemberApiController extends Controller
      * @apiSuccessExample {json} Success Response:
      * HTTP/1.1 200 OK
      * {
-     *   "message": "Product deleted successfully",
+     *   "message": "Member deleted successfully",
      *   "id": 2
      * }
      */
     public function destroy($id)
     {
-        $product = Member::findOrFail($id);
-        $product->delete();
-        return response()->json(['message' => 'Product deleted successfully', 'id' => $id]);
+        $member = Member::find($id);
+
+        if (!$member) {
+            return response()->json(['message' => 'Not found!'], 404);
+        }
+
+        $member->delete();
+        return response()->json(['message' => 'Member deleted successfully', 'id' => $id], 410);
     }
 }

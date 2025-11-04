@@ -83,7 +83,7 @@ class SongApiController extends Controller
 
         return response()->json([
             'product' => $product,
-        ]);
+        ], 201);
     }
 
     /**
@@ -123,11 +123,15 @@ class SongApiController extends Controller
             'lyrics' => 'nullable|string',
             'album_id' => 'nullable|exists:albums,id',
         ]);
-        $product = Song::findOrFail($id);
-        $product->update($request->all());
+        $song = Song::find($id);
+
+        if (!$song) {
+        return response()->json(['message' => 'Not found!'], 404);
+        }
+        $song->update($request->all());
 
         return response()->json([
-            'product' => $product,
+            'product' => $song,
         ]);
     }
 
@@ -152,11 +156,16 @@ class SongApiController extends Controller
      */
     public function destroy($id)
     {
-        $product = Song::findOrFail($id);
-        $product->delete();
+        $song = Song::find($id);
+
+        if (!$song) {
+            return response()->json(['message' => 'Not found!'], 404);
+        }
+
+        $song->delete();
         return response()->json([
-            'message' => 'Product deleted successfully',
+            'message' => 'Song deleted successfully',
             'id' => $id
-        ]);
+        ], 410);
     }
 }

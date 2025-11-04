@@ -115,9 +115,14 @@ class AlbumApiController extends Controller
             'artist_id' => 'nullable|exists:artists,id'
         ]);
 
-        $product = Album::findOrFail($id);
-        $product->update($request->all());
-        return response()->json(['product' => $product]);
+        $album = Album::find($id);
+
+        if (!$album) {
+        return response()->json(['message' => 'Not found!'], 404);
+        }
+
+        $album->update($request->all());
+        return response()->json(['product' => $album]);
     }
 
     /**
@@ -136,8 +141,13 @@ class AlbumApiController extends Controller
      */
     public function destroy($id)
     {
-        $product = Album::findOrFail($id);
-        $product->delete();
-        return response()->json(['message' => 'Product deleted successfully', 'id' => $id]);
+        $album = Album::find($id);
+
+        if (!$album) {
+            return response()->json(['message' => 'Not found!'], 404);
+        }
+
+        $album->delete();
+        return response()->json(['message' => 'Album deleted successfully', 'id' => $id], 410);
     }
 }
