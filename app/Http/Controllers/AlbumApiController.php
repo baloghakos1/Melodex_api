@@ -36,8 +36,8 @@ class AlbumApiController extends Controller
      * }
      */
     public function index() {
-        $songs = Album::all();
-        return response()->json(['songs' => $songs]);
+        $albums = Album::all();
+        return response()->json(['albums' => $albums]);
     }
 
     /**
@@ -76,8 +76,8 @@ class AlbumApiController extends Controller
             'artist_id' => 'required|exists:artists,id'
         ]);
 
-        $product = Album::create($request->all());
-        return response()->json(['product' => $product], 201);
+        $album = Album::create($request->all());
+        return response()->json(['album' => $album], 201);
     }
 
     /**

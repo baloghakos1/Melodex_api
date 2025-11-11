@@ -36,8 +36,8 @@ class MemberApiController extends Controller
      * }
      */
     public function index() {
-        $songs = Member::all();
-        return response()->json(['songs' => $songs]);
+        $members = Member::all();
+        return response()->json(['members' => $members]);
     }
 
     /**
@@ -82,8 +82,8 @@ class MemberApiController extends Controller
             'image' => 'nullable|string'
         ]);
 
-        $product = Member::create($request->all());
-        return response()->json(['product' => $product], 201);
+        $member = Member::create($request->all());
+        return response()->json(['member' => $member], 201);
     }
 
     /**
@@ -131,7 +131,7 @@ class MemberApiController extends Controller
         }
 
         $member->update($request->all());
-        return response()->json(['product' => $member]);
+        return response()->json(['member' => $member]);
     }
 
     /**

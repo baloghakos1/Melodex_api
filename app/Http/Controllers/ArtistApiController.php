@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Artist;
+use App\Models\Member;
+use App\Models\Album;
 use Illuminate\Http\Request;
 
 class ArtistApiController extends Controller
@@ -35,9 +37,43 @@ class ArtistApiController extends Controller
      *   ]
      * }
      */
-    public function index() {
-        $songs = Artist::all();
-        return response()->json(['songs' => $songs]);
+    public function index()
+    {
+        $artists = Artist::all();
+        return response()->json(['artists' => $artists]);
+    }
+
+
+    public function index_member($id)
+    {
+        $artist = Artist::find($id);
+
+        if (!$artist) {
+            return response()->json(['message' => 'Artist not found'], 404);
+        }
+
+        if ($artist->member->isEmpty()) {
+            return response()->json(['message' => 'Artist is not a band'], 400);
+        }
+
+        return response()->json([
+            'artist' => $artist->name,
+            'members' => $artist->member
+        ]);
+    }
+
+    public function index_album($id)
+    {
+        $artist = Artist::find($id);
+
+        if (!$artist) {
+            return response()->json(['message' => 'Artist not found'], 404);
+        }
+
+        return response()->json([
+            'artist' => $artist->name,
+            'albums' => $artist->album
+        ]);
     }
 
     /**
@@ -76,8 +112,53 @@ class ArtistApiController extends Controller
             'is_band' => 'required|string'
         ]);
 
-        $product = Artist::create($request->all());
-        return response()->json(['product' => $product], 201);
+        $artist = Artist::create($request->all());
+        return response()->json(['artist' => $artist], 201);
+    }
+
+    public function store_member(Request $request, $id)
+    {
+        $artist = Artist::find($id);
+
+        if (!$artist) {
+            return response()->json(['message' => 'Artist not found'], 404);
+        }
+
+        if ($artist->member->isEmpty()) {
+            return response()->json(['message' => 'Artist is not a band'], 400);
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'instrument' => 'required|string|max:255',
+            'year' => 'required|integer',
+            'image' => 'nullable|string'
+        ]);
+
+        $member = $artist->member()->create($request->all());
+
+        return response()->json(['message' => 'Member created successfully', 'member' => $member], 201);
+    }
+
+    public function store_album(Request $request, $id)
+    {
+        $artist = Artist::find($id);
+
+        if (!$artist) {
+            return response()->json(['message' => 'Artist not found'], 404);
+        }
+
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'cover' => 'nullable|string',
+            'year' => 'required|integer',
+            'genre' => 'required|string|max:255',
+        ]);
+
+        $album = $artist->album()->create($request->all());
+
+        return response()->json(['message' => 'Album created successfully', 'album' => $album], 201);
     }
 
     /**
@@ -109,26 +190,84 @@ class ArtistApiController extends Controller
      * }
      */
     public function update(Request $request, $id)
-{
-    $request->validate([
-        'name' => 'nullable|string|max:255',
-        'nationality' => 'nullable|string|max:255',
-        'image' => 'nullable|string',
-        'description' => 'nullable|string',
-        'is_band' => 'nullable|string',
-    ]);
+    {
 
-    $artist = Artist::find($id);
+        $request->validate([
+            'name' => 'nullable|string|max:255',
+            'nationality' => 'nullable|string|max:255',
+            'image' => 'nullable|string',
+            'description' => 'nullable|string',
+            'is_band' => 'nullable|string',
+        ]);
 
-    if (!$artist) {
-        return response()->json(['message' => 'Not found!'], 404);
+        $artist = Artist::find($id);
+
+        if (!$artist) {
+            return response()->json(['message' => 'Not found!'], 404);
+        }
+
+        $artist->update($request->all());
+
+        return response()->json(['artist' => $artist]);
     }
 
-    $artist->update($request->all());
+    public function update_member(Request $request, $artist_id, $id)
+    {
 
-    return response()->json(['artist' => $artist]);
-}
+        $artist = Artist::find($artist_id);
 
+        if (!$artist) {
+            return response()->json(['message' => 'Artist not found'], 404);
+        }
+
+        if ($artist->member->isEmpty()) {
+            return response()->json(['message' => 'Artist is not a band'], 400);
+        }
+
+        $member = $artist->member()->find($id);
+
+        if (!$member) {
+            return response()->json(['message' => 'Member not found'], 404);
+        }
+
+        $request->validate([
+            'name' => 'nullable|string|max:255',
+            'instrument' => 'nullable|string|max:255',
+            'year' => 'nullable|integer',
+            'image' => 'nullable|string'
+        ]);
+
+        $member->update($request->all());
+
+        return response()->json(['message' => 'Member updated successfully', 'member' => $member]);
+    }
+
+    public function update_album(Request $request, $artist_id, $id)
+    {
+
+        $artist = Artist::find($artist_id);
+
+        if (!$artist) {
+            return response()->json(['message' => 'Artist not found'], 404);
+        }
+
+        $album = $artist->album()->find($id);
+
+        if (!$album) {
+            return response()->json(['message' => 'Album not found'], 404);
+        }
+
+        $request->validate([
+            'name' => 'nullable|string|max:255',
+            'cover' => 'nullable|string',
+            'year' => 'nullable|integer',
+            'genre' => 'nullable|string|max:255',
+        ]);
+
+        $album->update($request->all());
+
+        return response()->json(['message' => 'Album updated successfully', 'album' => $album]);
+    }
 
     /**
      * @api {delete} http://localhost:8000/api/artist/:id Delete an artist
@@ -157,5 +296,48 @@ class ArtistApiController extends Controller
 
         $artist->delete();
         return response()->json(['message' => 'Artist deleted successfully', 'id' => $id], 410);
+    }
+
+    public function destroy_member($artist_id, $id)
+    {
+        $artist = Artist::find($artist_id);
+
+        if (!$artist) {
+            return response()->json(['message' => 'Artist not found'], 404);
+        }
+
+        if ($artist->member->isEmpty()) {
+            return response()->json(['message' => 'Artist is not a band'], 400);
+        }
+
+        $member = $artist->member()->find($id);
+
+        if (!$member) {
+            return response()->json(['message' => 'Member not found'], 404);
+        }
+
+        $member->delete();
+
+        return response()->json(['message' => 'Member deleted successfully'], 410);
+    }
+
+    public function destroy_album($artist_id, $id)
+    {
+        $artist = Artist::find($artist_id);
+
+        if (!$artist) {
+            return response()->json(['message' => 'Artist not found'], 404);
+        }
+
+
+        $album = $artist->album()->find($id);
+
+        if (!$album) {
+            return response()->json(['message' => 'Album not found'], 404);
+        }
+
+        $album->delete();
+
+        return response()->json(['message' => 'Album deleted successfully'], 410);
     }
 }

@@ -79,10 +79,10 @@ class SongApiController extends Controller
             'lyrics' => 'nullable|string',
             'album_id' => 'required|exists:albums,id',
         ]);
-        $product = Song::create($request->all());
+        $song = Song::create($request->all());
 
         return response()->json([
-            'product' => $product,
+            'song' => $song,
         ], 201);
     }
 
