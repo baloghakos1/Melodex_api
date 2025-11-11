@@ -1,7 +1,7 @@
 | URL                                | HTTP Method | Auth | JSON Response               |
 | ---------------------------------- | ----------- | ---- | --------------------------- |
-| `/user/login`                      | POST        | ✅    | User's token                |
-| `/users`                           | GET         | ❌    | All users                   |
+| `/user/login`                      | POST        | ❌    | User's token                |
+| `/users`                           | GET         | ✅    | All users                   |
 | `/artists`                         | GET         | ❌    | All artists                 |
 | `/artist`                          | POST        | ✅    | New artist added            |
 | `/artist/{id}`                     | PATCH       | ✅    | Edited artist               |
