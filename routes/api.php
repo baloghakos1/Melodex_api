@@ -22,21 +22,26 @@ Route::get('/artist/{id}/albums', [ArtistApiController::class, 'index_album']);
 Route::post('/artist/{id}/album', [ArtistApiController::class, 'store_album'])->middleware('auth:sanctum');
 Route::patch('/artist/{artist_id}/album/{id}', [ArtistApiController::class, 'update_album'])->middleware('auth:sanctum');
 Route::delete('/artist/{artist_id}/album/{id}', [ArtistApiController::class, 'destroy_album'])->middleware('auth:sanctum');
+//--Artist/Album/Song--
+Route::get('/artist/{artist_id}/album/{id}/songs', [ArtistApiController::class, 'index_song']);
+Route::post('/artist/{artist_id}/album/{id}/song', [ArtistApiController::class, 'store_song'])->middleware('auth:sanctum');
+Route::patch('/artist/{artist_id}/album/{album_id}/song/{id}', [ArtistApiController::class, 'update_song'])->middleware('auth:sanctum');
+Route::delete('/artist/{artist_id}/album/{album_id}/song/{id}', [ArtistApiController::class, 'destroy_song'])->middleware('auth:sanctum');
 //--Member--
 Route::get('/members', [MemberApiController::class, 'index']);
 Route::post('/member', [MemberApiController::class, 'store'])->middleware('auth:sanctum');
 Route::patch('/member/{id}', [MemberApiController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/member/{id}', [MemberApiController::class, 'destroy'])->middleware('auth:sanctum');
-
+//--Album--
 Route::get('/albums', [AlbumApiController::class, 'index']);
 Route::post('/album', [AlbumApiController::class, 'store'])->middleware('auth:sanctum');
 Route::patch('/album/{id}', [AlbumApiController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/album/{id}', [AlbumApiController::class, 'destroy'])->middleware('auth:sanctum');
-
+//--Song--
 Route::get('/songs', [SongApiController::class, 'index']);
 Route::post('/song', [SongApiController::class, 'store'])->middleware('auth:sanctum');
 Route::patch('/song/{id}', [SongApiController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/song/{id}', [SongApiController::class, 'destroy'])->middleware('auth:sanctum');
-
+//--User--
 Route::post('/user/login', [UserApiController::class, 'login']);
 Route::get('/users', [UserApiController::class, 'index'])->middleware('auth:sanctum');

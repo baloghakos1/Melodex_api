@@ -76,6 +76,27 @@ class ArtistApiController extends Controller
         ]);
     }
 
+    public function index_song($artist_id,$id)
+    {
+        $artist = Artist::find($artist_id);
+
+        if (!$artist) {
+            return response()->json(['message' => 'Artist not found'], 404);
+        }
+
+        $album = $artist->album()->find($id);
+
+        if (!$album) {
+            return response()->json(['message' => 'Album not found for this artist'], 404);
+        }
+
+        return response()->json([
+            'artist' => $artist->name,
+            'album' => $album->name,
+            'songs' => $album->song
+        ]);
+    }
+
     /**
      * @api {post} http://localhost:8000/api/artist Create a new artist
      * @apiName CreateArtist
@@ -159,6 +180,32 @@ class ArtistApiController extends Controller
         $album = $artist->album()->create($request->all());
 
         return response()->json(['message' => 'Album created successfully', 'album' => $album], 201);
+    }
+
+    public function store_song(Request $request, $artist_id, $id)
+    {
+        $artist = Artist::find($artist_id);
+
+        if (!$artist) {
+            return response()->json(['message' => 'Artist not found'], 404);
+        }
+
+        $album = $artist->album()->find($id);
+
+        if (!$album) {
+            return response()->json(['message' => 'Album not found for this artist'], 404);
+        }
+
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'songwriter' => 'required|string|max:255',
+            'lyrics' => 'nullable|string',
+        ]);
+
+        $song = $album->song()->create($request->all());
+
+        return response()->json(['message' => 'Song created successfully', 'Song' => $song], 201);
     }
 
     /**
@@ -269,6 +316,38 @@ class ArtistApiController extends Controller
         return response()->json(['message' => 'Album updated successfully', 'album' => $album]);
     }
 
+    public function update_song(Request $request, $artist_id, $album_id, $id)
+    {
+
+        $artist = Artist::find($artist_id);
+
+        if (!$artist) {
+            return response()->json(['message' => 'Artist not found'], 404);
+        }
+
+        $album = $artist->album()->find($album_id);
+
+        if (!$album) {
+            return response()->json(['message' => 'Album not found for this artist'], 404);
+        }
+
+        $song = $album->song()->find($id);
+
+        if (!$song) {
+            return response()->json(['message' => 'Song not found for this album'], 404);
+        }
+
+        $request->validate([
+            'name' => 'nullable|string|max:255',
+            'songwriter' => 'nullable|string|max:255',
+            'lyrics' => 'nullable|string',
+        ]);
+
+        $song->update($request->all());
+
+        return response()->json(['message' => 'Song updated successfully', 'Song' => $song]);
+    }
+
     /**
      * @api {delete} http://localhost:8000/api/artist/:id Delete an artist
      * @apiName DeleteArtist
@@ -339,5 +418,30 @@ class ArtistApiController extends Controller
         $album->delete();
 
         return response()->json(['message' => 'Album deleted successfully'], 410);
+    }
+
+    public function destroy_song($artist_id, $album_id, $id)
+    {
+        $artist = Artist::find($artist_id);
+
+        if (!$artist) {
+            return response()->json(['message' => 'Artist not found'], 404);
+        }
+
+        $album = $artist->album()->find($album_id);
+
+        if (!$album) {
+            return response()->json(['message' => 'Album not found for this artist'], 404);
+        }
+
+        $song = $album->song()->find($id);
+
+        if (!$song) {
+            return response()->json(['message' => 'Song not found for this album'], 404);
+        }
+
+        $song->delete();
+
+        return response()->json(['message' => 'Song deleted successfully'], 410);
     }
 }
