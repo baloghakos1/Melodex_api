@@ -83,7 +83,7 @@ class MemberApiController extends Controller
         ]);
 
         $member = Member::create($request->all());
-        return response()->json(['message' => 'Member created successfully', 'Member' => $member], 201);
+        return response()->json(['message' => 'Member created successfully', 'member' => $member], 201);
     }
 
     /**
@@ -131,7 +131,7 @@ class MemberApiController extends Controller
         }
 
         $member->update($request->all());
-        return response()->json(['message' => 'Member updated successfully', 'Member' => $member]);
+        return response()->json(['message' => 'Member updated successfully', 'member' => $member]);
     }
 
     /**

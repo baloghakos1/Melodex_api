@@ -35,9 +35,7 @@ class SongApiController extends Controller
      */
     public function index() {
         $songs = Song::all();
-        return response()->json([
-            'songs' => $songs,
-        ]);
+        return response()->json(['songs' => $songs]);
     }
 
     /**
@@ -81,7 +79,7 @@ class SongApiController extends Controller
         ]);
         $song = Song::create($request->all());
 
-        return response()->json(['message' => 'Song created successfully', 'Song' => $song], 201);
+        return response()->json(['message' => 'Song created successfully', 'song' => $song], 201);
     }
 
     /**
@@ -128,7 +126,7 @@ class SongApiController extends Controller
         }
         $song->update($request->all());
 
-        return response()->json(['message' => 'Song updated successfully', 'Song' => $song]);
+        return response()->json(['message' => 'Song updated successfully', 'song' => $song]);
     }
 
     /**

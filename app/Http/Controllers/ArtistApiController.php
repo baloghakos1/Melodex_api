@@ -25,7 +25,7 @@ class ArtistApiController extends Controller
      * @apiSuccessExample {json} Success Response:
      * HTTP/1.1 200 OK
      * {
-     *   "Artists": [
+     *   "artists": [
      *     {
      *       "id": 1,
      *       "name": "The Beatles",
@@ -40,9 +40,8 @@ class ArtistApiController extends Controller
     public function index()
     {
         $artists = Artist::all();
-        return response()->json(['Artists' => $artists]);
+        return response()->json(['artists' => $artists]);
     }
-    
 
 
     public function index_member($id)
@@ -135,7 +134,7 @@ class ArtistApiController extends Controller
         ]);
 
         $artist = Artist::create($request->all());
-        return response()->json(['message' => 'Artist created successfully', 'Artist' => $artist], 201);
+        return response()->json(['message' => 'Artist created successfully', 'artist' => $artist], 201);
     }
 
     public function store_member(Request $request, $id)
@@ -159,7 +158,7 @@ class ArtistApiController extends Controller
 
         $member = $artist->member()->create($request->all());
 
-        return response()->json(['message' => 'Member created successfully', 'Member' => $member], 201);
+        return response()->json(['message' => 'Member created successfully', 'member' => $member], 201);
     }
 
     public function store_album(Request $request, $id)
@@ -180,7 +179,7 @@ class ArtistApiController extends Controller
 
         $album = $artist->album()->create($request->all());
 
-        return response()->json(['message' => 'Album created successfully', 'Album' => $album], 201);
+        return response()->json(['message' => 'Album created successfully', 'album' => $album], 201);
     }
 
     public function store_song(Request $request, $artist_id, $id)
@@ -206,7 +205,7 @@ class ArtistApiController extends Controller
 
         $song = $album->song()->create($request->all());
 
-        return response()->json(['message' => 'Song created successfully', 'Song' => $song], 201);
+        return response()->json(['message' => 'Song created successfully', 'song' => $song], 201);
     }
 
     /**
@@ -256,7 +255,7 @@ class ArtistApiController extends Controller
 
         $artist->update($request->all());
 
-        return response()->json(['message' => 'Artist updated successfully', 'Artist' => $artist]);
+        return response()->json(['message' => 'Artist updated successfully', 'artist' => $artist]);
     }
 
     public function update_member(Request $request, $artist_id, $id)
@@ -287,7 +286,7 @@ class ArtistApiController extends Controller
 
         $member->update($request->all());
 
-        return response()->json(['message' => 'Member updated successfully', 'Member' => $member]);
+        return response()->json(['message' => 'Member updated successfully', 'member' => $member]);
     }
 
     public function update_album(Request $request, $artist_id, $id)
@@ -314,7 +313,7 @@ class ArtistApiController extends Controller
 
         $album->update($request->all());
 
-        return response()->json(['message' => 'Album updated successfully', 'Album' => $album]);
+        return response()->json(['message' => 'Album updated successfully', 'album' => $album]);
     }
 
     public function update_song(Request $request, $artist_id, $album_id, $id)
@@ -346,7 +345,7 @@ class ArtistApiController extends Controller
 
         $song->update($request->all());
 
-        return response()->json(['message' => 'Song updated successfully', 'Song' => $song]);
+        return response()->json(['message' => 'Song updated successfully', 'song' => $song]);
     }
 
     /**

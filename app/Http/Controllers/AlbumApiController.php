@@ -92,7 +92,7 @@ class AlbumApiController extends Controller
         ]);
 
         $album = Album::create($request->all());
-        return response()->json(['message' => 'Album created successfully', 'Album' => $album], 201);
+        return response()->json(['message' => 'Album created successfully', 'album' => $album], 201);
     }
 
     public function store_song(Request $request, $id)
@@ -111,7 +111,7 @@ class AlbumApiController extends Controller
 
         $song = $album->song()->create($request->all());
 
-        return response()->json(['message' => 'Song created successfully', 'Song' => $song], 201);
+        return response()->json(['message' => 'Song created successfully', 'song' => $song], 201);
     }
 
     /**
@@ -156,7 +156,7 @@ class AlbumApiController extends Controller
         }
 
         $album->update($request->all());
-        return response()->json(['message' => 'Album updated successfully', 'Album' => $album]);
+        return response()->json(['message' => 'Album updated successfully', 'album' => $album]);
     }
 
     public function update_song(Request $request, $album_id, $id)
@@ -182,7 +182,7 @@ class AlbumApiController extends Controller
 
         $song->update($request->all());
 
-        return response()->json(['message' => 'Song updated successfully', 'Song' => $song]);
+        return response()->json(['message' => 'Song updated successfully', 'song' => $song]);
     }
 
     /**
