@@ -37,6 +37,11 @@ Route::get('/albums', [AlbumApiController::class, 'index']);
 Route::post('/album', [AlbumApiController::class, 'store'])->middleware('auth:sanctum');
 Route::patch('/album/{id}', [AlbumApiController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/album/{id}', [AlbumApiController::class, 'destroy'])->middleware('auth:sanctum');
+//--Album/Song--
+Route::get('/album/{id}/songs', [AlbumApiController::class, 'index_song']);
+Route::post('/album/{id}/song', [AlbumApiController::class, 'store_song'])->middleware('auth:sanctum');
+Route::patch('/album/{album_id}/song/{id}', [AlbumApiController::class, 'update_song'])->middleware('auth:sanctum');
+Route::delete('/album/{album_id}/song/{id}', [AlbumApiController::class, 'destroy_song'])->middleware('auth:sanctum');
 //--Song--
 Route::get('/songs', [SongApiController::class, 'index']);
 Route::post('/song', [SongApiController::class, 'store'])->middleware('auth:sanctum');

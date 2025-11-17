@@ -81,9 +81,7 @@ class SongApiController extends Controller
         ]);
         $song = Song::create($request->all());
 
-        return response()->json([
-            'song' => $song,
-        ], 201);
+        return response()->json(['message' => 'Song created successfully', 'Song' => $song], 201);
     }
 
     /**
@@ -126,13 +124,11 @@ class SongApiController extends Controller
         $song = Song::find($id);
 
         if (!$song) {
-        return response()->json(['message' => 'Not found!'], 404);
+            return response()->json(['message' => 'Song not found'], 404);
         }
         $song->update($request->all());
 
-        return response()->json([
-            'product' => $song,
-        ]);
+        return response()->json(['message' => 'Song updated successfully', 'Song' => $song]);
     }
 
     /**
@@ -159,7 +155,7 @@ class SongApiController extends Controller
         $song = Song::find($id);
 
         if (!$song) {
-            return response()->json(['message' => 'Not found!'], 404);
+            return response()->json(['message' => 'Song not found'], 404);
         }
 
         $song->delete();

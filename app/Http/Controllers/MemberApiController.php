@@ -83,7 +83,7 @@ class MemberApiController extends Controller
         ]);
 
         $member = Member::create($request->all());
-        return response()->json(['member' => $member], 201);
+        return response()->json(['message' => 'Member created successfully', 'Member' => $member], 201);
     }
 
     /**
@@ -127,11 +127,11 @@ class MemberApiController extends Controller
         $member = Member::find($id);
 
         if (!$member) {
-            return response()->json(['message' => 'Not found!'], 404);
+            return response()->json(['message' => 'Member not found'], 404);
         }
 
         $member->update($request->all());
-        return response()->json(['member' => $member]);
+        return response()->json(['message' => 'Member updated successfully', 'Member' => $member]);
     }
 
     /**
@@ -156,7 +156,7 @@ class MemberApiController extends Controller
         $member = Member::find($id);
 
         if (!$member) {
-            return response()->json(['message' => 'Not found!'], 404);
+            return response()->json(['message' => 'Member not found'], 404);
         }
 
         $member->delete();
