@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class ArtistApiController extends Controller
 {
     /**
-     * @api {get} http://localhost:8000/api/artists Get all artists
+     * @api {get} /api/artists Get all artists
      * @apiName GetArtists
      * @apiGroup Artist
      *
@@ -43,7 +43,7 @@ class ArtistApiController extends Controller
         return response()->json(['artists' => $artists]);
     }
     /**
-     * @api {get} http://localhost:8000/api/artists/:id/members Get members of a band
+     * @api {get} /api/artists/:id/members Get members of a band
      * @apiName GetArtistMembers
      * @apiGroup Artist
      *
@@ -114,7 +114,7 @@ class ArtistApiController extends Controller
         ]);
     }
     /**
-     * @api {get} http://localhost:8000/api/artists/:id/albums Get albums of an artist
+     * @api {get} /api/artists/:id/albums Get albums of an artist
      * @apiName GetArtistAlbums
      * @apiGroup Artist
      *
@@ -175,7 +175,7 @@ class ArtistApiController extends Controller
         ]);
     }
     /**
-     * @api {get} http://localhost:8000/api/artists/:artist_id/albums/:id/songs Get songs of an album
+     * @api {get} /api/artists/:artist_id/albums/:id/songs Get songs of an album
      * @apiName GetAlbumSongs
      * @apiGroup Artist
      *
@@ -250,7 +250,7 @@ class ArtistApiController extends Controller
     }
 
     /**
-     * @api {post} http://localhost:8000/api/artist Create a new artist
+     * @api {post} /api/artist Create a new artist
      * @apiName CreateArtist
      * @apiGroup Artist
      *
@@ -309,7 +309,7 @@ class ArtistApiController extends Controller
         return response()->json(['message' => 'Artist created successfully', 'artist' => $artist], 201);
     }
     /**
-     * @api {post} http://localhost:8000/api/artists/:id/members Add a new member to a band
+     * @api {post} /api/artists/:id/members Add a new member to a band
      * @apiName CreateMember
      * @apiGroup Member
      *
@@ -392,7 +392,7 @@ class ArtistApiController extends Controller
         return response()->json(['message' => 'Member created successfully', 'member' => $member], 201);
     }
     /**
-     * @api {post} http://localhost:8000/api/artists/:id/albums Add a new album for an artist
+     * @api {post} /api/artists/:id/albums Add a new album for an artist
      * @apiName CreateAlbum
      * @apiGroup Album
      *
@@ -466,7 +466,7 @@ class ArtistApiController extends Controller
         return response()->json(['message' => 'Album created successfully', 'album' => $album], 201);
     }
     /**
-     * @api {post} http://localhost:8000/api/artists/:artist_id/albums/:id/songs Add a new song to an album
+     * @api {post} /api/artists/:artist_id/albums/:id/songs Add a new song to an album
      * @apiName CreateSong
      * @apiGroup Song
      *
@@ -549,7 +549,7 @@ class ArtistApiController extends Controller
     }
 
     /**
-     * @api {put} http://localhost:8000/api/artist/:id Update an artist
+     * @api {put} /api/artist/:id Update an artist
      * @apiName UpdateArtist
      * @apiGroup Artist
      *
@@ -624,7 +624,7 @@ class ArtistApiController extends Controller
         return response()->json(['message' => 'Artist updated successfully', 'artist' => $artist]);
     }
     /**
-     * @api {put} http://localhost:8000/api/artists/:artist_id/members/:id Update a member of a band
+     * @api {put} /api/artists/:artist_id/members/:id Update a member of a band
      * @apiName UpdateMember
      * @apiGroup Member
      *
@@ -720,7 +720,7 @@ class ArtistApiController extends Controller
         return response()->json(['message' => 'Member updated successfully', 'member' => $member]);
     }
     /**
-     * @api {put} http://localhost:8000/api/artists/:artist_id/albums/:id Update an album of an artist
+     * @api {put} /api/artists/:artist_id/albums/:id Update an album of an artist
      * @apiName UpdateAlbum
      * @apiGroup Album
      *
@@ -806,7 +806,7 @@ class ArtistApiController extends Controller
         return response()->json(['message' => 'Album updated successfully', 'album' => $album]);
     }
     /**
-     * @api {put} http://localhost:8000/api/artists/:artist_id/albums/:album_id/songs/:id Update a song of an album
+     * @api {put} /api/artists/:artist_id/albums/:album_id/songs/:id Update a song of an album
      * @apiName UpdateSong
      * @apiGroup Song
      *
@@ -902,7 +902,7 @@ class ArtistApiController extends Controller
     }
 
     /**
-     * @api {delete} http://localhost:8000/api/artists/:id Delete an artist
+     * @api {delete} /api/artists/:id Delete an artist
      * @apiName DeleteArtist
      * @apiGroup Artist
      *
@@ -938,7 +938,7 @@ class ArtistApiController extends Controller
         return response()->json(['message' => 'Artist deleted successfully', 'id' => $id], 410);
     }
     /**
-     * @api {delete} http://localhost:8000/api/artists/:artist_id/members/:id Delete a member of a band
+     * @api {delete} /api/artists/:artist_id/members/:id Delete a member of a band
      * @apiName DeleteMember
      * @apiGroup Member
      *
@@ -998,7 +998,7 @@ class ArtistApiController extends Controller
         return response()->json(['message' => 'Member deleted successfully', 'id' => $id], 410);
     }
     /**
-     * @api {delete} http://localhost:8000/api/artists/:artist_id/albums/:id Delete an album of an artist
+     * @api {delete} /api/artists/:artist_id/albums/:id Delete an album of an artist
      * @apiName DeleteAlbum
      * @apiGroup Album
      *
@@ -1049,7 +1049,7 @@ class ArtistApiController extends Controller
         return response()->json(['message' => 'Album deleted successfully', 'id' => $id], 410);
     }
     /**
-     * @api {delete} http://localhost:8000/api/artists/:artist_id/albums/:album_id/songs/:id Delete a song from an album
+     * @api {delete} /api/artists/:artist_id/albums/:album_id/songs/:id Delete a song from an album
      * @apiName DeleteSong
      * @apiGroup Song
      *

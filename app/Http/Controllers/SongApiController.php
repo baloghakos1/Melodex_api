@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class SongApiController extends Controller
 {
     /**
-     * @api {get} http://localhost:8000/api/songs Get all songs
+     * @api {get} /api/songs Get all songs
      * @apiName GetSongs
      * @apiGroup Song
      *
@@ -16,7 +16,7 @@ class SongApiController extends Controller
      * @apiSuccess {Number} songs.id Song ID.
      * @apiSuccess {String} songs.name Song title.
      * @apiSuccess {String} songs.songwriter Songwriter name.
-     * @apiSuccess {String} songs.lyrics Song lyrics.
+     * @apiSuccess {String} songs.lyrics Song lyrics (nullable).
      * @apiSuccess {Number} songs.album_id Associated album ID.
      *
      * @apiSuccessExample {json} Success Response:
@@ -39,34 +39,35 @@ class SongApiController extends Controller
     }
 
     /**
-     * @api {post} http://localhost:8000/api/song Create a new song
+     * @api {post} /api/songs Create a new song
      * @apiName CreateSong
      * @apiGroup Song
      *
      * @apiBody {String} name Song title (required).
      * @apiBody {String} songwriter Songwriter name (required).
-     * @apiBody {String} [lyrics] Song lyrics (optional).
+     * @apiBody {String} [lyrics] Song lyrics (nullable).
      * @apiBody {Number} album_id Associated album ID (required, must exist in albums table).
      *
-     * @apiSuccess {Object} product Created song data.
-     * @apiSuccess {Number} product.id Song ID.
-     * @apiSuccess {String} product.name Song title.
-     * @apiSuccess {String} product.songwriter Songwriter name.
-     * @apiSuccess {String} product.lyrics Song lyrics.
-     * @apiSuccess {Number} product.album_id Associated album ID.
-     *
-     * @apiError (422) ValidationError Some required fields are missing or invalid.
+     * @apiSuccess {String} message Success message.
+     * @apiSuccess {Object} song Created song data.
      *
      * @apiSuccessExample {json} Success Response:
      * HTTP/1.1 201 Created
      * {
-     *   "product": {
+     *   "message": "Song created successfully",
+     *   "song": {
      *     "id": 1,
      *     "name": "Hey Jude",
      *     "songwriter": "Paul McCartney",
      *     "lyrics": "Hey Jude, don't make it bad...",
      *     "album_id": 3
      *   }
+     * }
+     *
+     * @apiErrorExample {json} Validation Error:
+     * HTTP/1.1 422 Unprocessable Entity
+     * {
+     *   "message": "The name field is required."
      * }
      */
     public function store(Request $request)
@@ -83,32 +84,37 @@ class SongApiController extends Controller
     }
 
     /**
-     * @api {put} http://localhost:8000/api/song/:id Update a song
+     * @api {put} /api/songs/:id Update a song
      * @apiName UpdateSong
      * @apiGroup Song
      *
-     * @apiParam {Number} id Song unique ID.
+     * @apiParam {Number} id Song ID.
      *
      * @apiBody {String} [name] Song title.
      * @apiBody {String} [songwriter] Songwriter name.
-     * @apiBody {String} [lyrics] Song lyrics.
-     * @apiBody {Number} [album_id] Associated album ID.
+     * @apiBody {String} [lyrics] Song lyrics (nullable).
+     * @apiBody {Number} [album_id] Associated album ID (must exist in albums table).
      *
-     * @apiSuccess {Object} product Updated song data.
-     *
-     * @apiError (404) NotFound Song not found.
-     * @apiError (422) ValidationError Some fields are invalid.
+     * @apiSuccess {String} message Success message.
+     * @apiSuccess {Object} song Updated song data.
      *
      * @apiSuccessExample {json} Success Response:
      * HTTP/1.1 200 OK
      * {
-     *   "product": {
+     *   "message": "Song updated successfully",
+     *   "song": {
      *     "id": 1,
      *     "name": "Hey Jude (Remastered)",
      *     "songwriter": "Paul McCartney",
      *     "lyrics": "Updated lyrics...",
      *     "album_id": 3
      *   }
+     * }
+     *
+     * @apiErrorExample {json} Song Not Found:
+     * HTTP/1.1 404 Not Found
+     * {
+     *   "message": "Song not found"
      * }
      */
     public function update(Request $request, $id)
@@ -130,22 +136,26 @@ class SongApiController extends Controller
     }
 
     /**
-     * @api {delete} http://localhost:8000/api/song/:id Delete a song
+     * @api {delete} /api/songs/:id Delete a song
      * @apiName DeleteSong
      * @apiGroup Song
      *
-     * @apiParam {Number} id Song unique ID.
+     * @apiParam {Number} id Song ID.
      *
      * @apiSuccess {String} message Success message.
      * @apiSuccess {Number} id Deleted song ID.
      *
-     * @apiError (404) NotFound Song not found.
-     *
      * @apiSuccessExample {json} Success Response:
-     * HTTP/1.1 200 OK
+     * HTTP/1.1 410 Gone
      * {
-     *   "message": "Product deleted successfully",
+     *   "message": "Song deleted successfully",
      *   "id": 1
+     * }
+     *
+     * @apiErrorExample {json} Song Not Found:
+     * HTTP/1.1 404 Not Found
+     * {
+     *   "message": "Song not found"
      * }
      */
     public function destroy($id)
