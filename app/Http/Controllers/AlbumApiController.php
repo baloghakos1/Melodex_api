@@ -289,7 +289,6 @@ class AlbumApiController extends Controller
      *   "message": "Song not found for this album"
      * }
      */
-
     public function update_song(Request $request, $album_id, $id)
     {
 
@@ -380,7 +379,6 @@ class AlbumApiController extends Controller
      *   "message": "Song not found for this album"
      * }
      */
-
     public function destroy_song($album_id, $id)
     {
         $album = Album::find($album_id);
