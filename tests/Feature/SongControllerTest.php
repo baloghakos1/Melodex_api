@@ -100,7 +100,7 @@ class SongControllerTest extends TestCase
         ]);
 
         $response->assertStatus(404)
-            ->assertJsonFragment(['message' => 'Not found!']);
+            ->assertJsonFragment(['message' => 'Song not found']);
     }
 
     public function test_delete_removes_song()

@@ -102,7 +102,7 @@ class MemberControllerTest extends TestCase
         ]);
 
         $response->assertStatus(404)
-            ->assertJsonFragment(['message' => 'Not found!']);
+            ->assertJsonFragment(['message' => 'Member not found']);
     }
 
     public function test_delete_removes_member()

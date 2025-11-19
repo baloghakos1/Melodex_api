@@ -101,7 +101,7 @@ class ArtistControllerTest extends TestCase
         ]);
 
         $response->assertStatus(404)
-            ->assertJsonFragment(['message' => 'Not found!']);
+            ->assertJsonFragment(['message' => 'Artist not found']);
     }
 
     public function test_delete_removes_artist()
