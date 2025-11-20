@@ -225,6 +225,27 @@ class AlbumControllerTest extends TestCase
             ->assertJsonFragment(['message' => 'Album deleted successfully']);
 
         $this->assertDatabaseMissing('albums', ['id' => $album->id]);
+    }
+
+    public function test_delete_song_removes_song_from_album()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+        $album = Album::factory()->create(['name' => 'Midnights']);
+
+        $song = Song::factory()->create([
+            'album_id' => $album->id,
+            'name' => 'Original Name',
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->deleteJson("/api/album/{$album->id}/song/{$song->id}");
+
+        $response->assertStatus(410)
+            ->assertJsonFragment(['message' => 'Song deleted successfully']);
+
+        $this->assertDatabaseMissing('songs', ['id' => $song->id]);
     } 
 
 }
