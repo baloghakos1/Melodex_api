@@ -84,7 +84,7 @@ class AlbumApiController extends Controller
 
         return response()->json([
             'album' => $album->name,
-            'songs' => $album->song
+            'songs' => $album->songs
         ]);
     }
 
@@ -189,7 +189,7 @@ class AlbumApiController extends Controller
             'lyrics' => 'nullable|string',
         ]);
 
-        $song = $album->song()->create($request->all());
+        $song = $album->songs()->create($request->all());
 
         return response()->json(['message' => 'Song created successfully', 'song' => $song], 201);
     }
@@ -298,7 +298,7 @@ class AlbumApiController extends Controller
             return response()->json(['message' => 'Album not found'], 404);
         }
 
-        $song = $album->song()->find($id);
+        $song = $album->songs()->find($id);
 
         if (!$song) {
             return response()->json(['message' => 'Song not found for this album'], 404);
@@ -387,7 +387,7 @@ class AlbumApiController extends Controller
             return response()->json(['message' => 'Album not found'], 404);
         }
 
-        $song = $album->song()->find($id);
+        $song = $album->songs()->find($id);
 
         if (!$song) {
             return response()->json(['message' => 'Song not found for this album'], 404);

@@ -10,13 +10,13 @@ class Artist extends Model
 
     public $timestamps = false;
 
-    function member()
+    public function members()
     {
-        return $this->hasMany(Member::class);
+        return $this->belongsToMany(Member::class, 'artists_members');
     }
 
 
-    function album()
+    function albums()
     {
         return $this->hasMany(Album::class);
     }

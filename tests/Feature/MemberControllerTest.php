@@ -54,7 +54,6 @@ class MemberControllerTest extends TestCase
             'name' => 'Bob',
             'instrument' => 'Piano',
             'year' => '2000',
-            'artist_id' => $artist->id
         ]);
 
 		// teszteljük, hogy 200-as kódot kapunk-e és a válaszban benne van-e az újonnan hozzáadott adat.
@@ -67,7 +66,6 @@ class MemberControllerTest extends TestCase
             'name' => 'Bob',
             'instrument' => 'Piano',
             'year' => '2000',
-            'artist_id' => $artist->id
         ]);
     }
 

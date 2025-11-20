@@ -9,12 +9,12 @@ class Album extends Model
     use HasFactory;
     public $timestamps = false;
 
-    function artist()
+    function artists()
     {
         return $this->belongsTo(Artist::class);
     }
 
-    function song()
+    function songs()
     {
         return $this->hasMany(Song::class);
     }

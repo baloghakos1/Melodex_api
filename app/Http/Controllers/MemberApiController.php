@@ -29,15 +29,16 @@ class MemberApiController extends Controller
      *       "name": "John Lennon",
      *       "instrument": "Guitar",
      *       "year": "1960",
-     *       "artist_id": 1,
      *       "image": "lennon.jpg"
      *     }
      *   ]
      * }
      */
     public function index() {
-        $members = Member::all();
-        return response()->json(['members' => $members]);
+        $members = Member::with('artists')->get();
+        return response()->json([
+            'members' => $members
+        ]);
     }
 
     /**
@@ -63,7 +64,6 @@ class MemberApiController extends Controller
      *     "name": "Paul McCartney",
      *     "instrument": "Bass",
      *     "year": "1960",
-     *     "artist_id": 1,
      *     "image": "paul.jpg"
      *   }
      * }
@@ -74,7 +74,6 @@ class MemberApiController extends Controller
             'name' => 'required|string|max:255',
             'instrument' => 'required|string|max:255',
             'year' => 'required|integer',
-            'artist_id' => 'required|exists:artists,id',
             'image' => 'nullable|string'
         ]);
 

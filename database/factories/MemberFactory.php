@@ -23,7 +23,6 @@ class MemberFactory extends Factory
 			'name' => $this->faker->unique()->word(),
             'instrument' => $this->faker->unique()->word(),
             'year' => $this->faker->unique()->word(),
-            'artist_id' => Artist::factory()
 		];
 	}
 }
