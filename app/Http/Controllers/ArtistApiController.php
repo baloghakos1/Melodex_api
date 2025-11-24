@@ -104,7 +104,7 @@ class ArtistApiController extends Controller
             return response()->json(['message' => 'Artist not found'], 404);
         }
 
-        if ($artist->is_band == "no") {
+        if ($artist->is_band == "0") {
             return response()->json(['message' => 'Artist is not a band'], 400);
         }
 
@@ -376,7 +376,7 @@ class ArtistApiController extends Controller
             return response()->json(['message' => 'Artist not found'], 404);
         }
 
-        if ($artist->is_band == "no") {
+        if ($artist->is_band == "0") {
             return response()->json(['message' => 'Artist is not a band'], 400);
         }
 
@@ -390,6 +390,30 @@ class ArtistApiController extends Controller
         $member = $artist->members()->create($request->all());
 
         return response()->json(['message' => 'Member created successfully', 'member' => $member], 201);
+    }
+
+    public function store_artist_member_connection(Request $request)
+    {
+        $data = $request->validate([
+            'artist_id' => 'required|exists:artists,id',
+            'member_id' => 'required|exists:members,id',
+        ]);
+
+        $artist = Artist::find($data['artist_id']);
+        if (!$artist) {
+            return response()->json(['message' => 'Artist not found'], 404);
+        }
+
+        if ($artist->is_band == "0") {
+            return response()->json(['message' => 'Artist is not a band'], 400);
+        }
+        $member = Member::find($data['member_id']);
+        if (!$member) {
+            return response()->json(['message' => 'Member not found'], 404);
+        }
+        $artist->members()->syncWithoutDetaching([$member->id]);
+
+        return response()->json(['message' => 'Member linked to artist.', 'artist' => $artist->name, 'member' => $member->name], 201);
     }
     /**
      * @api {post} /api/artists/:id/albums Add a new album for an artist
@@ -698,7 +722,7 @@ class ArtistApiController extends Controller
             return response()->json(['message' => 'Artist not found'], 404);
         }
 
-        if ($artist->is_band == "no") {
+        if ($artist->is_band == "0") {
             return response()->json(['message' => 'Artist is not a band'], 400);
         }
 
@@ -983,7 +1007,7 @@ class ArtistApiController extends Controller
             return response()->json(['message' => 'Artist not found'], 404);
         }
 
-        if ($artist->is_band == "no") {
+        if ($artist->is_band == "0") {
             return response()->json(['message' => 'Artist is not a band'], 400);
         }
 

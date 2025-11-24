@@ -32,6 +32,9 @@ Route::get('/members', [MemberApiController::class, 'index']);
 Route::post('/member', [MemberApiController::class, 'store'])->middleware('auth:sanctum');
 Route::patch('/member/{id}', [MemberApiController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/member/{id}', [MemberApiController::class, 'destroy'])->middleware('auth:sanctum');
+//--Artist-Member Connection--
+Route::post('/artists_members', [ArtistApiController::class, 'store_artist_member_connection'])->middleware('auth:sanctum');
+//todo: more routes of artists_members
 //--Album--
 Route::get('/albums', [AlbumApiController::class, 'index']);
 Route::post('/album', [AlbumApiController::class, 'store'])->middleware('auth:sanctum');
