@@ -239,7 +239,7 @@ class ArtistApiController extends Controller
         $album = $artist->album()->find($id);
 
         if (!$album) {
-            return response()->json(['message' => 'Album not found for this artist'], 404);
+            return response()->json(['message' => 'Album not found'], 404);
         }
 
         return response()->json([
@@ -533,7 +533,7 @@ class ArtistApiController extends Controller
         $album = $artist->album()->find($id);
 
         if (!$album) {
-            return response()->json(['message' => 'Album not found for this artist'], 404);
+            return response()->json(['message' => 'Album not found'], 404);
         }
 
 
@@ -705,7 +705,7 @@ class ArtistApiController extends Controller
         $member = $artist->member()->find($id);
 
         if (!$member) {
-            return response()->json(['message' => 'Member not found for this artist'], 404);
+            return response()->json(['message' => 'Member not found'], 404);
         }
 
         $request->validate([
@@ -791,7 +791,7 @@ class ArtistApiController extends Controller
         $album = $artist->album()->find($id);
 
         if (!$album) {
-            return response()->json(['message' => 'Album not found for this artist'], 404);
+            return response()->json(['message' => 'Album not found'], 404);
         }
 
         $request->validate([
@@ -881,13 +881,13 @@ class ArtistApiController extends Controller
         $album = $artist->album()->find($album_id);
 
         if (!$album) {
-            return response()->json(['message' => 'Album not found for this artist'], 404);
+            return response()->json(['message' => 'Album not found'], 404);
         }
 
         $song = $album->song()->find($id);
 
         if (!$song) {
-            return response()->json(['message' => 'Song not found for this album'], 404);
+            return response()->json(['message' => 'Song not found'], 404);
         }
 
         $request->validate([
@@ -1098,13 +1098,13 @@ class ArtistApiController extends Controller
         $album = $artist->album()->find($album_id);
 
         if (!$album) {
-            return response()->json(['message' => 'Album not found for this artist'], 404);
+            return response()->json(['message' => 'Album not found'], 404);
         }
 
         $song = $album->song()->find($id);
 
         if (!$song) {
-            return response()->json(['message' => 'Song not found for this album'], 404);
+            return response()->json(['message' => 'Song not found'], 404);
         }
 
         $song->delete();

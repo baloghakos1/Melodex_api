@@ -301,7 +301,7 @@ class AlbumApiController extends Controller
         $song = $album->song()->find($id);
 
         if (!$song) {
-            return response()->json(['message' => 'Song not found for this album'], 404);
+            return response()->json(['message' => 'Song not found'], 404);
         }
 
         $request->validate([
@@ -390,7 +390,7 @@ class AlbumApiController extends Controller
         $song = $album->song()->find($id);
 
         if (!$song) {
-            return response()->json(['message' => 'Song not found for this album'], 404);
+            return response()->json(['message' => 'Song not found'], 404);
         }
 
         $song->delete();
