@@ -38,7 +38,7 @@ class SongControllerTest extends TestCase
             ->assertJsonFragment(['name' => 'Nikes'])
             ->assertJsonMissing(['name' => 'Godspeed']);
     }
-  
+
     public function test_store_creates_new_song()
     {
         // Létrehozunk egy felhasználót
@@ -59,9 +59,9 @@ class SongControllerTest extends TestCase
 		// teszteljük, hogy 200-as kódot kapunk-e és a válaszban benne van-e az újonnan hozzáadott adat.
         $response->assertStatus(201)
             ->assertJsonFragment(['name' => 'Bob']);
-		
+
 		// teszteljük, hogy az adatbázisban is ott van-e at adat
-        $this->assertDatabaseHas('songs', 
+        $this->assertDatabaseHas('songs',
         [
             'name' => 'Bob',
             'songwriter' => 'asd',
@@ -87,7 +87,7 @@ class SongControllerTest extends TestCase
 
         $this->assertDatabaseHas('songs', ['id' => $song->id, 'name' => 'Asd']);
     }
-    
+
     public function test_update_returns_404_for_missing_song()
     {
         $user = User::factory()->create();
@@ -117,6 +117,20 @@ class SongControllerTest extends TestCase
             ->assertJsonFragment(['message' => 'Song deleted successfully']);
 
         $this->assertDatabaseMissing('songs', ['id' => $song->id]);
-    } 
+    }
+
+    public function test_delete_returns_404_for_missing_song()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+        $song = Song::factory()->create(['name' => 'Nikes']);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->deleteJson('/api/song/999');
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Song not found']);
+    }
 
 }

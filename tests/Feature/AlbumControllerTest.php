@@ -76,7 +76,7 @@ class AlbumControllerTest extends TestCase
             ->assertJsonFragment(['name' => 'The Life of a Showgirl'])
             ->assertJsonMissing(['name' => 'Born Pink']);
     }
-  
+
     public function test_store_creates_new_album()
     {
 		$user = User::factory()->create();
@@ -94,7 +94,7 @@ class AlbumControllerTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonFragment(['name' => 'Bob']);
-		
+
         $this->assertDatabaseHas('albums',
         [
             'name' => 'Bob',
@@ -123,7 +123,7 @@ class AlbumControllerTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonFragment(['name' => 'asd']);
-		
+
         $this->assertDatabaseHas('songs',
         [
             'name' => 'asd',
@@ -167,7 +167,7 @@ class AlbumControllerTest extends TestCase
 
         $this->assertDatabaseHas('albums', ['id' => $album->id, 'name' => 'Asd']);
     }
-    
+
     public function test_update_returns_404_for_missing_album()
     {
         $user = User::factory()->create();
@@ -307,7 +307,6 @@ class AlbumControllerTest extends TestCase
 
         $response->assertStatus(404)
             ->assertJsonFragment(['message' => 'Album not found']);
-            
     }
 
     public function test_delete_song_returns_404_for_missing_song()
@@ -322,7 +321,6 @@ class AlbumControllerTest extends TestCase
 
         $response->assertStatus(404)
             ->assertJsonFragment(['message' => 'Song not found']);
-            
     }
 
 }

@@ -176,8 +176,8 @@ class ArtistControllerTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonFragment(['name' => 'Bob']);
-		
-        $this->assertDatabaseHas('artists', 
+
+        $this->assertDatabaseHas('artists',
         [
             'name' => 'Bob',
             'nationality' => 'Hungarian',
@@ -206,8 +206,8 @@ class ArtistControllerTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonFragment(['name' => 'Bob']);
-		
-        $this->assertDatabaseHas('members', 
+
+        $this->assertDatabaseHas('members',
         [
             'name' => 'Bob',
             'instrument' => 'Vocals',
@@ -333,8 +333,8 @@ class ArtistControllerTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonFragment(['message' => 'Song created successfully']);
-		
-        $this->assertDatabaseHas('songs', 
+
+        $this->assertDatabaseHas('songs',
         [
             'name' => 'Bob',
             'songwriter' => 'John',
@@ -624,6 +624,29 @@ class ArtistControllerTest extends TestCase
             ->assertJsonFragment(['message' => 'Album not found']);
     }
 
+    public function test_update_song_returns_404_for_missing_song()
+    {
+        $artist = Artist::factory()->create([
+            'name' => 'Taylor Swift',
+            'id' => 1,
+        ]);
+        $album = Album::factory()->create([
+            'name' => 'Midnights',
+            'artist_id'=> $artist->id
+        ]);
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->patchJson("/api/artist/{$artist->id}/album/{$album->id}/song/999999", [
+            'name' => 'Asd'
+        ]);
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Song not found']);
+    }
+
     public function test_delete_removes_artist()
     {
         $user = User::factory()->create();
@@ -638,5 +661,231 @@ class ArtistControllerTest extends TestCase
             ->assertJsonFragment(['message' => 'Artist deleted successfully']);
 
         $this->assertDatabaseMissing('artists', ['id' => $artist->id]);
-    } 
+    }
+
+    public function test_delete_returns_404_for_missing_artist()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+        $artist = Artist::factory()->create(['name' => 'Taylor Swift']);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->deleteJson("/api/artist/99999");
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Artist not found']);
+    }
+
+    public function test_delete_member_removes_member()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+        $artist = Artist::factory()->create([
+            'name' => 'Taylor Swift',
+            'id' => 1,
+            'is_band' => 'yes',
+        ]);
+        $member = Member::factory()->create([
+            'name' => 'Bob',
+            'artist_id'=> $artist->id
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->deleteJson("/api/artist/{$artist->id}/member/{$member->id}");
+
+        $response->assertStatus(410)
+            ->assertJsonFragment(['message' => 'Member deleted successfully']);
+
+        $this->assertDatabaseMissing('members', ['id' => $member->id]);
+    }
+
+    public function test_delete_member_returns_404_for_missing_artist()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+        $artist = Artist::factory()->create(['name' => 'Taylor Swift']);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->deleteJson("/api/artist/99999/member/1");
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Artist not found']);
+    }
+
+    public function test_delete_member_returns_404_for_missing_member()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+        $artist = Artist::factory()->create([
+            'name' => 'Taylor Swift',
+            'id' => 1,
+            'is_band' => 'yes',
+        ]);
+
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->deleteJson("/api/artist/{$artist->id}/member/999999");
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Member not found']);
+    }
+
+    public function test_delete_member_returns_400_for_not_a_band()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+        $artist = Artist::factory()->create([
+            'name' => 'Taylor Swift',
+            'id' => 1,
+            'is_band' => 'no',
+        ]);
+        $member = Member::factory()->create([
+            'name' => 'Bob',
+            'artist_id'=> $artist->id
+        ]);
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->deleteJson("/api/artist/{$artist->id}/member/{$member->id}");
+
+        $response->assertStatus(400)
+            ->assertJsonFragment(['message' => 'Artist is not a band']);
+    }
+
+    public function test_delete_album_removes_album()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+        $artist = Artist::factory()->create([
+            'name' => 'Taylor Swift',
+            'id' => 1
+        ]);
+        $album = Album::factory()->create([
+            'name' => 'Midnights',
+            'artist_id' => $artist->id
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->deleteJson("/api/artist/{$artist->id}/album/{$album->id}");
+
+        $response->assertStatus(410)
+            ->assertJsonFragment(['message' => 'Album deleted successfully']);
+
+        $this->assertDatabaseMissing('albums', ['id' => $album->id]);
+    }
+
+    public function test_delete_album_returns_404_for_missing_artist()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+        $artist = Artist::factory()->create(['name' => 'Taylor Swift']);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->deleteJson("/api/artist/99999/album/1");
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Artist not found']);
+    }
+
+    public function test_delete_album_returns_404_for_missing_album()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+        $artist = Artist::factory()->create([
+            'name' => 'Taylor Swift',
+            'id' => 1
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->deleteJson("/api/artist/{$artist->id}/album/99999");
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Album not found']);
+    }
+
+    public function test_delete_song_removes_song()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+        $artist = Artist::factory()->create([
+            'name' => 'Taylor Swift',
+            'id' => 1
+        ]);
+        $album = Album::factory()->create([
+            'name' => 'Midnights',
+            'artist_id' => $artist->id
+        ]);
+        $song = Song::factory()->create([
+            'name' => 'Asd',
+            'album_id' => $album->id
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->deleteJson("/api/artist/{$artist->id}/album/{$album->id}/song/{$song->id}");
+
+        $response->assertStatus(410)
+            ->assertJsonFragment(['message' => 'Song deleted successfully']);
+
+        $this->assertDatabaseMissing('songs', ['id' => $song->id]);
+    }
+
+    public function test_delete_song_returns_404_for_missing_artist()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+        $artist = Artist::factory()->create(['name' => 'Taylor Swift']);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->deleteJson("/api/artist/99999/album/1/song/1");
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Artist not found']);
+    }
+
+    public function test_delete_song_returns_404_for_missing_album()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+        $artist = Artist::factory()->create([
+            'name' => 'Taylor Swift',
+            'id' => 1
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->deleteJson("/api/artist/{$artist->id}/album/99999/song/1");
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Album not found']);
+    }
+
+    public function test_delete_song_returns_404_for_missing_song()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+        $artist = Artist::factory()->create([
+            'name' => 'Taylor Swift',
+            'id' => 1
+        ]);
+        $album = Album::factory()->create([
+            'name' => 'Midnights',
+            'artist_id' => $artist->id
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->deleteJson("/api/artist/{$artist->id}/album/{$album->id}/song/99999");
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Song not found']);
+    }
+
 }
