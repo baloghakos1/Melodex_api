@@ -187,7 +187,7 @@ class ArtistApiController extends Controller
 
     public function single_index_album($artist_id, $id)
     {
-        $artist = Artist::find($id);
+        $artist = Artist::find($artist_id);
 
         if (!$artist) {
             return response()->json(['message' => 'Artist not found'], 404);
