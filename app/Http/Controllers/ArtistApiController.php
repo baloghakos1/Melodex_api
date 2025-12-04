@@ -42,6 +42,16 @@ class ArtistApiController extends Controller
         $artists = Artist::all();
         return response()->json(['artists' => $artists]);
     }
+
+    public function single_index($id)
+    {
+        $artist = Artist::find($id);
+
+        if (!$artist) {
+            return response()->json(['message' => 'Artist not found'], 404);
+        }
+        return response()->json(['artist' => $artist]);
+    }
     /**
      * @api {get} /api/artists/:id/members Get members of a band
      * @apiName GetArtistMembers
@@ -174,6 +184,27 @@ class ArtistApiController extends Controller
             'albums' => $artist->album
         ]);
     }
+
+    public function single_index_album($artist_id, $id)
+    {
+        $artist = Artist::find($id);
+
+        if (!$artist) {
+            return response()->json(['message' => 'Artist not found'], 404);
+        }
+
+        $album = $artist->album()->find($id);
+
+        if (!$album) {
+            return response()->json(['message' => 'Album not found'], 404);
+        }
+
+        return response()->json([
+            'artist' => $artist->name,
+            'album' => $album
+        ]);
+    }
+
     /**
      * @api {get} /api/artists/:artist_id/albums/:id/songs Get songs of an album
      * @apiName GetAlbumSongs

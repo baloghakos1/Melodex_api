@@ -9,6 +9,7 @@ use App\Http\Controllers\MemberApiController;
 use App\Http\Controllers\AlbumApiController;
 //--Artist--
 Route::get('/artists', [ArtistApiController::class, 'index']);
+Route::get('/artist/{id}', [ArtistApiController::class, 'single_index']);
 Route::post('/artist', [ArtistApiController::class, 'store'])->middleware('auth:sanctum');
 Route::patch('/artist/{id}', [ArtistApiController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/artist/{id}', [ArtistApiController::class, 'destroy'])->middleware('auth:sanctum');
@@ -19,6 +20,7 @@ Route::patch('/artist/{artist_id}/member/{id}', [ArtistApiController::class, 'up
 Route::delete('/artist/{artist_id}/member/{id}', [ArtistApiController::class, 'destroy_member'])->middleware('auth:sanctum');
 //--Artist/Album--
 Route::get('/artist/{id}/albums', [ArtistApiController::class, 'index_album']);
+Route::get('/artist/{artist_id}/album/{id}', [ArtistApiController::class, 'single_index_album']);
 Route::post('/artist/{id}/album', [ArtistApiController::class, 'store_album'])->middleware('auth:sanctum');
 Route::patch('/artist/{artist_id}/album/{id}', [ArtistApiController::class, 'update_album'])->middleware('auth:sanctum');
 Route::delete('/artist/{artist_id}/album/{id}', [ArtistApiController::class, 'destroy_album'])->middleware('auth:sanctum');
