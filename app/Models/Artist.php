@@ -21,6 +21,20 @@ class Artist extends Model
         return $this->hasMany(Album::class);
     }
 
+    protected static function booted()
+    {
+        static::deleting(function ($artist) {
+
+            // Delete albums (albums will delete songs)
+            $artist->album()->each(function ($album) {
+                $album->delete();
+            });
+
+            // Delete members
+            $artist->member()->delete();
+        });
+    }
+
     protected $fillable = [
         'name',
         'nationality',

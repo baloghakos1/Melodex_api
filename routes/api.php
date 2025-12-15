@@ -46,6 +46,7 @@ Route::patch('/album/{album_id}/song/{id}', [AlbumApiController::class, 'update_
 Route::delete('/album/{album_id}/song/{id}', [AlbumApiController::class, 'destroy_song'])->middleware('auth:sanctum');
 //--Song--
 Route::get('/songs', [SongApiController::class, 'index']);
+Route::get('/song/{id}', [SongApiController::class, 'single_index'])->middleware('auth:sanctum');
 Route::post('/song', [SongApiController::class, 'store'])->middleware('auth:sanctum');
 Route::patch('/song/{id}', [SongApiController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/song/{id}', [SongApiController::class, 'destroy'])->middleware('auth:sanctum');

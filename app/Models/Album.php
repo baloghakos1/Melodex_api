@@ -19,6 +19,13 @@ class Album extends Model
         return $this->hasMany(Song::class);
     }
 
+    protected static function booted()
+    {
+        static::deleting(function ($album) {
+            $album->song()->delete();
+        });
+    }
+
     protected $fillable = [
         'name',
         'cover',
