@@ -39,6 +39,15 @@ class AlbumApiController extends Controller
         $albums = Album::all();
         return response()->json(['albums' => $albums]);
     }
+
+    public function single_index($id) {
+        $album = Album::find($id);
+
+        if (!$album) {
+            return response()->json(['message' => 'Album not found'], 404);
+        }
+        return response()->json(['Album' => $album]);
+    }
     /**
      * @api {get} /api/albums/:id/songs Get songs of an album
      * @apiName GetAlbumSongs

@@ -31,11 +31,13 @@ Route::patch('/artist/{artist_id}/album/{album_id}/song/{id}', [ArtistApiControl
 Route::delete('/artist/{artist_id}/album/{album_id}/song/{id}', [ArtistApiController::class, 'destroy_song'])->middleware('auth:sanctum');
 //--Member--
 Route::get('/members', [MemberApiController::class, 'index']);
+Route::get('/member/{id}', [MemberApiController::class, 'single_index']);
 Route::post('/member', [MemberApiController::class, 'store'])->middleware('auth:sanctum');
 Route::patch('/member/{id}', [MemberApiController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/member/{id}', [MemberApiController::class, 'destroy'])->middleware('auth:sanctum');
 //--Album--
 Route::get('/albums', [AlbumApiController::class, 'index']);
+Route::get('/album/{id}', [AlbumApiController::class, 'single_index']);
 Route::post('/album', [AlbumApiController::class, 'store'])->middleware('auth:sanctum');
 Route::patch('/album/{id}', [AlbumApiController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/album/{id}', [AlbumApiController::class, 'destroy'])->middleware('auth:sanctum');
