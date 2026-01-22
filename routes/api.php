@@ -13,11 +13,6 @@ Route::get('/artist/{id}', [ArtistApiController::class, 'single_index']);
 Route::post('/artist', [ArtistApiController::class, 'store'])->middleware('auth:sanctum');
 Route::patch('/artist/{id}', [ArtistApiController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/artist/{id}', [ArtistApiController::class, 'destroy'])->middleware('auth:sanctum');
-//--Artist/Member--
-Route::get('/artist/{id}/members', [ArtistApiController::class, 'index_member']);
-Route::post('/artist/{id}/member', [ArtistApiController::class, 'store_member'])->middleware('auth:sanctum');
-Route::patch('/artist/{artist_id}/member/{id}', [ArtistApiController::class, 'update_member'])->middleware('auth:sanctum');
-Route::delete('/artist/{artist_id}/member/{id}', [ArtistApiController::class, 'destroy_member'])->middleware('auth:sanctum');
 //--Artist/Album--
 Route::get('/artist/{id}/albums', [ArtistApiController::class, 'index_album']);
 Route::get('/artist/{artist_id}/album/{id}', [ArtistApiController::class, 'single_index_album']);
@@ -29,15 +24,6 @@ Route::get('/artist/{artist_id}/album/{id}/songs', [ArtistApiController::class, 
 Route::post('/artist/{artist_id}/album/{id}/song', [ArtistApiController::class, 'store_song'])->middleware('auth:sanctum');
 Route::patch('/artist/{artist_id}/album/{album_id}/song/{id}', [ArtistApiController::class, 'update_song'])->middleware('auth:sanctum');
 Route::delete('/artist/{artist_id}/album/{album_id}/song/{id}', [ArtistApiController::class, 'destroy_song'])->middleware('auth:sanctum');
-//--Member--
-Route::get('/members', [MemberApiController::class, 'index']);
-Route::get('/member/{id}', [MemberApiController::class, 'single_index']);
-Route::post('/member', [MemberApiController::class, 'store'])->middleware('auth:sanctum');
-Route::patch('/member/{id}', [MemberApiController::class, 'update'])->middleware('auth:sanctum');
-Route::delete('/member/{id}', [MemberApiController::class, 'destroy'])->middleware('auth:sanctum');
-//--Artist-Member Connection--
-Route::post('/artists_members', [ArtistApiController::class, 'store_artist_member_connection'])->middleware('auth:sanctum');
-//todo: more routes of artists_members
 //--Album--
 Route::get('/albums', [AlbumApiController::class, 'index']);
 Route::get('/album/{id}', [AlbumApiController::class, 'single_index']);
