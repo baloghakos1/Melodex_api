@@ -38,6 +38,15 @@ class SongApiController extends Controller
         return response()->json(['songs' => $songs]);
     }
 
+    public function single_index($id) {
+        $song = Song::find($id);
+
+        if (!$song) {
+            return response()->json(['message' => 'Song not found'], 404);
+        }
+        return response()->json(['Song' => $song]);
+    }
+
     /**
      * @api {post} /api/songs Create a new song
      * @apiName CreateSong

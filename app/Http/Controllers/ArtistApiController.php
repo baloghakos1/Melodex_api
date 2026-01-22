@@ -42,6 +42,16 @@ class ArtistApiController extends Controller
         $artists = Artist::all();
         return response()->json(['artists' => $artists]);
     }
+
+    public function single_index($id)
+    {
+        $artist = Artist::find($id);
+
+        if (!$artist) {
+            return response()->json(['message' => 'Artist not found'], 404);
+        }
+        return response()->json(['artist' => $artist]);
+    }
     /**
      * @api {get} /api/artists/:id/members Get members of a band
      * @apiName GetArtistMembers
@@ -174,6 +184,27 @@ class ArtistApiController extends Controller
             'albums' => $artist->albums
         ]);
     }
+
+    public function single_index_album($artist_id, $id)
+    {
+        $artist = Artist::find($artist_id);
+
+        if (!$artist) {
+            return response()->json(['message' => 'Artist not found'], 404);
+        }
+
+        $album = $artist->album()->find($id);
+
+        if (!$album) {
+            return response()->json(['message' => 'Album not found'], 404);
+        }
+
+        return response()->json([
+            'artist' => $artist->name,
+            'album' => $album
+        ]);
+    }
+
     /**
      * @api {get} /api/artists/:artist_id/albums/:id/songs Get songs of an album
      * @apiName GetAlbumSongs
@@ -239,7 +270,7 @@ class ArtistApiController extends Controller
         $album = $artist->albums()->find($id);
 
         if (!$album) {
-            return response()->json(['message' => 'Album not found for this artist'], 404);
+            return response()->json(['message' => 'Album not found'], 404);
         }
 
         return response()->json([
@@ -557,7 +588,7 @@ class ArtistApiController extends Controller
         $album = $artist->albums()->find($id);
 
         if (!$album) {
-            return response()->json(['message' => 'Album not found for this artist'], 404);
+            return response()->json(['message' => 'Album not found'], 404);
         }
 
 
@@ -729,7 +760,7 @@ class ArtistApiController extends Controller
         $member = $artist->members()->find($id);
 
         if (!$member) {
-            return response()->json(['message' => 'Member not found for this artist'], 404);
+            return response()->json(['message' => 'Member not found'], 404);
         }
 
         $request->validate([
@@ -815,7 +846,7 @@ class ArtistApiController extends Controller
         $album = $artist->albums()->find($id);
 
         if (!$album) {
-            return response()->json(['message' => 'Album not found for this artist'], 404);
+            return response()->json(['message' => 'Album not found'], 404);
         }
 
         $request->validate([
@@ -905,13 +936,13 @@ class ArtistApiController extends Controller
         $album = $artist->albums()->find($album_id);
 
         if (!$album) {
-            return response()->json(['message' => 'Album not found for this artist'], 404);
+            return response()->json(['message' => 'Album not found'], 404);
         }
 
         $song = $album->songs()->find($id);
 
         if (!$song) {
-            return response()->json(['message' => 'Song not found for this album'], 404);
+            return response()->json(['message' => 'Song not found'], 404);
         }
 
         $request->validate([
@@ -1122,13 +1153,13 @@ class ArtistApiController extends Controller
         $album = $artist->albums()->find($album_id);
 
         if (!$album) {
-            return response()->json(['message' => 'Album not found for this artist'], 404);
+            return response()->json(['message' => 'Album not found'], 404);
         }
 
         $song = $album->song()->find($id);
 
         if (!$song) {
-            return response()->json(['message' => 'Song not found for this album'], 404);
+            return response()->json(['message' => 'Song not found'], 404);
         }
 
         $song->delete();

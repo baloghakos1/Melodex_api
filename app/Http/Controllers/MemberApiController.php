@@ -41,6 +41,15 @@ class MemberApiController extends Controller
         ]);
     }
 
+    public function single_index($id) {
+        $member = Member::find($id);
+
+        if (!$member) {
+            return response()->json(['message' => 'Member not found'], 404);
+        }
+        return response()->json(['Member' => $member]);
+    }
+
     /**
      * @api {post} /api/members Create a new member
      * @apiName CreateMember

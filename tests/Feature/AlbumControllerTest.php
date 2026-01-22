@@ -76,7 +76,7 @@ class AlbumControllerTest extends TestCase
             ->assertJsonFragment(['name' => 'The Life of a Showgirl'])
             ->assertJsonMissing(['name' => 'Born Pink']);
     }
-  
+
     public function test_store_creates_new_album()
     {
 		$user = User::factory()->create();
@@ -94,7 +94,7 @@ class AlbumControllerTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonFragment(['name' => 'Bob']);
-		
+
         $this->assertDatabaseHas('albums',
         [
             'name' => 'Bob',
@@ -123,7 +123,7 @@ class AlbumControllerTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonFragment(['name' => 'asd']);
-		
+
         $this->assertDatabaseHas('songs',
         [
             'name' => 'asd',
@@ -167,7 +167,7 @@ class AlbumControllerTest extends TestCase
 
         $this->assertDatabaseHas('albums', ['id' => $album->id, 'name' => 'Asd']);
     }
-    
+
     public function test_update_returns_404_for_missing_album()
     {
         $user = User::factory()->create();
@@ -211,6 +211,40 @@ class AlbumControllerTest extends TestCase
         ]);
     }
 
+    public function test_update_song_returns_404_for_missing_album()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->patchJson('/api/album/999/song/1', [
+            'name' => 'Bob Marley'
+        ]);
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Album not found']);
+    }
+
+    public function test_update_song_returns_404_for_missing_song()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+
+        $album = Album::factory()->create([
+            'name' => 'Midnights',
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->patchJson("/api/album/{$album->id}/song/9999", [
+            'name' => 'Bob Marley'
+        ]);
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Song not found']);
+    }
+
     public function test_delete_removes_album()
     {
         $user = User::factory()->create();
@@ -225,6 +259,20 @@ class AlbumControllerTest extends TestCase
             ->assertJsonFragment(['message' => 'Album deleted successfully']);
 
         $this->assertDatabaseMissing('albums', ['id' => $album->id]);
+    }
+
+    public function test_delete_returns_404_for_missing_album()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->deleteJson("/api/album/9999");
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Album not found']);
+
     }
 
     public function test_delete_song_removes_song_from_album()
@@ -246,6 +294,33 @@ class AlbumControllerTest extends TestCase
             ->assertJsonFragment(['message' => 'Song deleted successfully']);
 
         $this->assertDatabaseMissing('songs', ['id' => $song->id]);
-    } 
+    }
+
+    public function test_delete_song_returns_404_for_missing_album()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->deleteJson("/api/album/9999/song/1");
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Album not found']);
+    }
+
+    public function test_delete_song_returns_404_for_missing_song()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+        $album = Album::factory()->create(['name' => 'Midnights']);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->deleteJson("/api/album/{$album->id}/song/99999");
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Song not found']);
+    }
 
 }

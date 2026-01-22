@@ -38,16 +38,13 @@ class MemberControllerTest extends TestCase
             ->assertJsonFragment(['name' => 'Alex Turner'])
             ->assertJsonMissing(['name' => 'Lisa']);
     }
-  
+
     public function test_store_creates_new_member()
     {
-        // Létrehozunk egy felhasználót
 		$user = User::factory()->create();
-		// Lekérjük a tokent
         $token = $user->createToken('TestToken')->plainTextToken;
         $artist = Artist::factory()->create();
 
-		// A Header-ben elküldjük a tokent és meghívjuk a végpontot (postJson) a szükséges adatokkal
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
         ])->postJson('/api/member', [
@@ -56,12 +53,9 @@ class MemberControllerTest extends TestCase
             'year' => '2000',
         ]);
 
-		// teszteljük, hogy 200-as kódot kapunk-e és a válaszban benne van-e az újonnan hozzáadott adat.
         $response->assertStatus(201)
             ->assertJsonFragment(['name' => 'Bob']);
-		
-		// teszteljük, hogy az adatbázisban is ott van-e at adat
-        $this->assertDatabaseHas('members', 
+        $this->assertDatabaseHas('members',
         [
             'name' => 'Bob',
             'instrument' => 'Piano',
@@ -87,7 +81,7 @@ class MemberControllerTest extends TestCase
 
         $this->assertDatabaseHas('members', ['id' => $member->id, 'name' => 'Asd']);
     }
-    
+
     public function test_update_returns_404_for_missing_member()
     {
         $user = User::factory()->create();
@@ -117,6 +111,20 @@ class MemberControllerTest extends TestCase
             ->assertJsonFragment(['message' => 'Member deleted successfully']);
 
         $this->assertDatabaseMissing('members', ['id' => $member->id]);
-    } 
+    }
+
+    public function test_delete_returns_404_for_missing_member()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+        $member = Member::factory()->create(['name' => 'Alex Turner']);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->deleteJson("/api/member/{999999}");
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Member not found']);
+    }
 
 }
