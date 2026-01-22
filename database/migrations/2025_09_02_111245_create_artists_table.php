@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('nationality', 100);
             $table->string('image')->nullable();
             $table->text('description')->nullable();
-            $table->boolean('is_band');
         });
     }
 
