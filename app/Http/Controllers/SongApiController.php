@@ -83,9 +83,9 @@ class SongApiController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'songwriter' => 'required|string|max:255',
             'lyrics' => 'nullable|string',
-            'album_id' => 'required|exists:albums,id',
+            'album_id' => 'required|integer',
+            'stream_url' => 'required|string',
         ]);
         $song = Song::create($request->all());
 
@@ -130,9 +130,9 @@ class SongApiController extends Controller
     {
         $request->validate([
             'name' => 'nullable|string|max:255',
-            'songwriter' => 'nullable|string|max:255',
             'lyrics' => 'nullable|string',
-            'album_id' => 'nullable|exists:albums,id',
+            'album_id' => 'nullable|integer',
+            'stream_url' => 'nullable|string|max:255',
         ]);
         $song = Song::find($id);
 

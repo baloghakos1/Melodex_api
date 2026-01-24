@@ -17,8 +17,8 @@ class Song extends Model
 
     protected $fillable = [
         'name',
-        'songwriter',
         'lyrics',
-        'album_id'
+        'album_id',
+        'stream_url',
     ];
 }

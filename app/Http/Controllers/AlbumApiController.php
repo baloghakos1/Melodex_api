@@ -194,8 +194,9 @@ class AlbumApiController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'songwriter' => 'required|string|max:255',
             'lyrics' => 'nullable|string',
+            'album_id' => 'required|integer',
+            'stream_url' => 'required|string',
         ]);
 
         $song = $album->song()->create($request->all());
@@ -315,8 +316,9 @@ class AlbumApiController extends Controller
 
         $request->validate([
             'name' => 'nullable|string|max:255',
-            'songwriter' => 'nullable|string|max:255',
             'lyrics' => 'nullable|string',
+            'album_id' => 'nullable|integer',
+            'stream_url' => 'nullable|string|max:255',
         ]);
 
         $song->update($request->all());

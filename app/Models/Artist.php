@@ -10,11 +10,12 @@ class Artist extends Model
 
     public $timestamps = false;
 
-    function member()
-    {
-        return $this->hasMany(Member::class);
-    }
-
+    protected $fillable = [
+        'name',
+        'nationality',
+        'image',
+        'description',
+    ];
 
     function album()
     {
@@ -34,12 +35,4 @@ class Artist extends Model
             $artist->member()->delete();
         });
     }
-
-    protected $fillable = [
-        'name',
-        'nationality',
-        'image',
-        'description',
-        'is_band'
-    ];
 }

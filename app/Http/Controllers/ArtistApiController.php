@@ -53,77 +53,6 @@ class ArtistApiController extends Controller
         return response()->json(['artist' => $artist]);
     }
     /**
-     * @api {get} /api/artists/:id/members Get members of a band
-     * @apiName GetArtistMembers
-     * @apiGroup Artist
-     *
-     * @apiParam {Number} id Artist unique ID.
-     *
-     * @apiSuccess {String} artist Name of the band.
-     * @apiSuccess {Object[]} members List of band members.
-     * @apiSuccess {Number} members.id Member ID.
-     * @apiSuccess {String} members.name Member name.
-     * @apiSuccess {String} members.instrument Instrument played by the member.
-     * @apiSuccess {String} members.year Year the member joined the band.
-     * @apiSuccess {Number} members.artist_id ID of the associated artist.
-     * @apiSuccess {String} [members.image] Member image URL (optional).
-     *
-     * @apiSuccessExample {json} Success Response:
-     * HTTP/1.1 200 OK
-     * {
-     *   "artist": "The Beatles",
-     *   "members": [
-     *     {
-     *       "id": 1,
-     *       "name": "John Lennon",
-     *       "instrument": "Guitar",
-     *       "year": "1960",
-     *       "artist_id": 1,
-     *       "image": "john_lennon.jpg"
-     *     },
-     *     {
-     *       "id": 2,
-     *       "name": "Paul McCartney",
-     *       "instrument": "Bass",
-     *       "year": "1960",
-     *       "artist_id": 1,
-     *       "image": "paul_mccartney.jpg"
-     *     }
-     *   ]
-     * }
-     *
-     * @apiError {String} message Error message.
-     *
-     * @apiErrorExample {json} Artist Not Found:
-     * HTTP/1.1 404 Not Found
-     * {
-     *   "message": "Artist not found"
-     * }
-     *
-     * @apiErrorExample {json} Artist Not a Band:
-     * HTTP/1.1 400 Bad Request
-     * {
-     *   "message": "Artist is not a band"
-     * }
-     */
-    public function index_member($id)
-    {
-        $artist = Artist::find($id);
-
-        if (!$artist) {
-            return response()->json(['message' => 'Artist not found'], 404);
-        }
-
-        if ($artist->is_band == "no") {
-            return response()->json(['message' => 'Artist is not a band'], 400);
-        }
-
-        return response()->json([
-            'artist' => $artist->name,
-            'members' => $artist->member
-        ]);
-    }
-    /**
      * @api {get} /api/artists/:id/albums Get albums of an artist
      * @apiName GetArtistAlbums
      * @apiGroup Artist
@@ -330,97 +259,13 @@ class ArtistApiController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'nationality' => 'required|string|max:255',
+            'nationality' => 'nullable|string|max:255',
             'image' => 'nullable|string',
-            'description' => 'required|string',
-            'is_band' => 'required|string'
+            'description' => 'nullable|string',
         ]);
 
         $artist = Artist::create($request->all());
         return response()->json(['message' => 'Artist created successfully', 'artist' => $artist], 201);
-    }
-    /**
-     * @api {post} /api/artists/:id/members Add a new member to a band
-     * @apiName CreateMember
-     * @apiGroup Member
-     *
-     * @apiParam {Number} id Artist unique ID.
-     *
-     * @apiBody {String} name Member name (required).
-     * @apiBody {String} instrument Instrument played by the member (required).
-     * @apiBody {Number} year Year the member joined the band (required).
-     * @apiBody {String} [image] Member image URL (optional).
-     *
-     * @apiSuccess {String} message Success message.
-     * @apiSuccess {Object} member Created member data.
-     * @apiSuccess {Number} member.id Member ID.
-     * @apiSuccess {String} member.name Member name.
-     * @apiSuccess {String} member.instrument Instrument played by the member.
-     * @apiSuccess {Number} member.year Year the member joined.
-     * @apiSuccess {Number} member.artist_id ID of the associated artist.
-     * @apiSuccess {String} [member.image] Member image URL (optional).
-     *
-     * @apiSuccessExample {json} Success Response:
-     * HTTP/1.1 201 Created
-     * {
-     *   "message": "Member created successfully",
-     *   "member": {
-     *     "id": 1,
-     *     "name": "John Lennon",
-     *     "instrument": "Guitar",
-     *     "year": 1960,
-     *     "artist_id": 1,
-     *     "image": "john_lennon.jpg"
-     *   }
-     * }
-     *
-     * @apiError {String} message Error message.
-     *
-     * @apiErrorExample {json} Artist Not Found:
-     * HTTP/1.1 404 Not Found
-     * {
-     *   "message": "Artist not found"
-     * }
-     *
-     * @apiErrorExample {json} Artist Not a Band:
-     * HTTP/1.1 400 Bad Request
-     * {
-     *   "message": "Artist is not a band"
-     * }
-     *
-     * @apiErrorExample {json} Validation Error:
-     * HTTP/1.1 422 Unprocessable Entity
-     * {
-     *   "message": "The given data was invalid.",
-     *   "errors": {
-     *     "name": ["The name field is required."],
-     *     "instrument": ["The instrument field is required."],
-     *     "year": ["The year field is required."]
-     *   }
-     * }
-     */
-    public function store_member(Request $request, $id)
-    {
-        $artist = Artist::find($id);
-
-        if (!$artist) {
-            return response()->json(['message' => 'Artist not found'], 404);
-        }
-
-        if ($artist->is_band == "no") {
-            return response()->json(['message' => 'Artist is not a band'], 400);
-        }
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'instrument' => 'required|string|max:255',
-            'year' => 'required|integer',
-            'image' => 'nullable|string'
-        ]);
-
-        $member = $artist->member()->create($request->all());
-
-        return response()->json(['message' => 'Member created successfully', 'member' => $member], 201);
     }
     /**
      * @api {post} /api/artists/:id/albums Add a new album for an artist
@@ -570,8 +415,9 @@ class ArtistApiController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'songwriter' => 'required|string|max:255',
             'lyrics' => 'nullable|string',
+            'album_id' => 'required|integer',
+            'stream_url' => 'required|string',
         ]);
 
         $song = $album->song()->create($request->all());
@@ -641,7 +487,6 @@ class ArtistApiController extends Controller
             'nationality' => 'nullable|string|max:255',
             'image' => 'nullable|string',
             'description' => 'nullable|string',
-            'is_band' => 'nullable|string',
         ]);
 
         $artist = Artist::find($id);
@@ -653,102 +498,6 @@ class ArtistApiController extends Controller
         $artist->update($request->all());
 
         return response()->json(['message' => 'Artist updated successfully', 'artist' => $artist]);
-    }
-    /**
-     * @api {put} /api/artists/:artist_id/members/:id Update a member of a band
-     * @apiName UpdateMember
-     * @apiGroup Member
-     *
-     * @apiParam {Number} artist_id Artist unique ID.
-     * @apiParam {Number} id Member unique ID.
-     *
-     * @apiBody {String} [name] Member name.
-     * @apiBody {String} [instrument] Member instrument.
-     * @apiBody {Number} [year] Year the member joined or relevant year.
-     * @apiBody {String} [image] Member image URL.
-     *
-     * @apiSuccess {String} message Success message.
-     * @apiSuccess {Object} member Updated member data.
-     * @apiSuccess {Number} member.id Member ID.
-     * @apiSuccess {String} member.name Member name.
-     * @apiSuccess {String} member.instrument Member instrument.
-     * @apiSuccess {Number} member.year Year associated with the member.
-     * @apiSuccess {String} [member.image] Member image URL (optional).
-     * @apiSuccess {Number} member.artist_id ID of the associated artist.
-     *
-     * @apiSuccessExample {json} Success Response:
-     * HTTP/1.1 200 OK
-     * {
-     *   "message": "Member updated successfully",
-     *   "member": {
-     *     "id": 1,
-     *     "name": "John Lennon",
-     *     "instrument": "Guitar",
-     *     "year": 1960,
-     *     "image": "john_lennon.jpg",
-     *     "artist_id": 1
-     *   }
-     * }
-     *
-     * @apiError {String} message Error message.
-     *
-     * @apiErrorExample {json} Artist Not Found:
-     * HTTP/1.1 404 Not Found
-     * {
-     *   "message": "Artist not found"
-     * }
-     *
-     * @apiErrorExample {json} Artist Not a Band:
-     * HTTP/1.1 400 Bad Request
-     * {
-     *   "message": "Artist is not a band"
-     * }
-     *
-     * @apiErrorExample {json} Member Not Found:
-     * HTTP/1.1 404 Not Found
-     * {
-     *   "message": "Member not found for this artist"
-     * }
-     *
-     * @apiErrorExample {json} Validation Error:
-     * HTTP/1.1 422 Unprocessable Entity
-     * {
-     *   "message": "The given data was invalid.",
-     *   "errors": {
-     *     "name": ["The name must be a string."],
-     *     "year": ["The year must be an integer."]
-     *   }
-     * }
-     */
-    public function update_member(Request $request, $artist_id, $id)
-    {
-
-        $artist = Artist::find($artist_id);
-
-        if (!$artist) {
-            return response()->json(['message' => 'Artist not found'], 404);
-        }
-
-        if ($artist->is_band == "no") {
-            return response()->json(['message' => 'Artist is not a band'], 400);
-        }
-
-        $member = $artist->member()->find($id);
-
-        if (!$member) {
-            return response()->json(['message' => 'Member not found'], 404);
-        }
-
-        $request->validate([
-            'name' => 'nullable|string|max:255',
-            'instrument' => 'nullable|string|max:255',
-            'year' => 'nullable|integer',
-            'image' => 'nullable|string'
-        ]);
-
-        $member->update($request->all());
-
-        return response()->json(['message' => 'Member updated successfully', 'member' => $member]);
     }
     /**
      * @api {put} /api/artists/:artist_id/albums/:id Update an album of an artist
@@ -923,8 +672,9 @@ class ArtistApiController extends Controller
 
         $request->validate([
             'name' => 'nullable|string|max:255',
-            'songwriter' => 'nullable|string|max:255',
             'lyrics' => 'nullable|string',
+            'album_id' => 'nullable|integer',
+            'stream_url' => 'nullable|string',
         ]);
 
         $song->update($request->all());
@@ -967,66 +717,6 @@ class ArtistApiController extends Controller
 
         $artist->delete();
         return response()->json(['message' => 'Artist deleted successfully', 'id' => $id], 410);
-    }
-    /**
-     * @api {delete} /api/artists/:artist_id/members/:id Delete a member of a band
-     * @apiName DeleteMember
-     * @apiGroup Member
-     *
-     * @apiParam {Number} artist_id Artist unique ID.
-     * @apiParam {Number} id Member unique ID.
-     *
-     * @apiSuccess {String} message Success message.
-     * @apiSuccess {Number} id Deleted member ID.
-     *
-     * @apiSuccessExample {json} Success Response:
-     * HTTP/1.1 410 Gone
-     * {
-     *   "message": "Member deleted successfully",
-     *   "id": 3
-     * }
-     *
-     * @apiError {String} message Error message.
-     *
-     * @apiErrorExample {json} Artist Not Found:
-     * HTTP/1.1 404 Not Found
-     * {
-     *   "message": "Artist not found"
-     * }
-     *
-     * @apiErrorExample {json} Artist Not a Band:
-     * HTTP/1.1 400 Bad Request
-     * {
-     *   "message": "Artist is not a band"
-     * }
-     *
-     * @apiErrorExample {json} Member Not Found:
-     * HTTP/1.1 404 Not Found
-     * {
-     *   "message": "Member not found"
-     * }
-     */
-    public function destroy_member($artist_id, $id)
-    {
-        $artist = Artist::find($artist_id);
-
-        if (!$artist) {
-            return response()->json(['message' => 'Artist not found'], 404);
-        }
-
-        if ($artist->is_band == "no") {
-            return response()->json(['message' => 'Artist is not a band'], 400);
-        }
-
-        $member = $artist->member()->find($id);
-
-        if (!$member) {
-            return response()->json(['message' => 'Member not found'], 404);
-        }
-
-        $member->delete();
-
-        return response()->json(['message' => 'Member deleted successfully', 'id' => $id], 410);
     }
     /**
      * @api {delete} /api/artists/:artist_id/albums/:id Delete an album of an artist
