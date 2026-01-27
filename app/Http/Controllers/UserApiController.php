@@ -45,4 +45,80 @@ class UserApiController extends Controller
             'users' => $users,
         ]);
     }
+
+    public function index_playlist(Request $request, $id) 
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        return response()->json([
+            'user' => $user->name,
+            'playlists' => $user->playlists
+        ]);
+
+    }
+
+    public function store_playlist(Request $request, $id) 
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:100',
+        ]);
+
+        $playlist = $user->playlists()->create($request->all());
+
+        return response()->json(['message' => 'Playlist created successfully', 'playlist' => $playlist], 201);
+    }
+
+    public function update_playlist(Request $request, $user_id, $id)
+    {
+
+        $user = User::find($user_id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $playlist = $user->playlists()->find($id);
+
+        if (!$playlist) {
+            return response()->json(['message' => 'Playlist not found'], 404);
+        }
+
+        $request->validate([
+            'name' => 'nullable|string|max:100',
+        ]);
+
+        $playlist->update($request->all());
+
+        return response()->json(['message' => 'Playlist updated successfully', 'playlist' => $playlist]);
+    }
+
+    public function destroy_playlist($user_id, $id)
+    {
+        $user = User::find($user_id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+
+        $playlist = $user->playlists()->find($id);
+
+        if (!$playlist) {
+            return response()->json(['message' => 'Playlist not found'], 404);
+        }
+
+        $playlist->delete();
+
+        return response()->json(['message' => 'Playlist deleted successfully', 'id' => $id], 410);
+    }
 }

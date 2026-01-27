@@ -13,6 +13,19 @@ class PlaylistApiController extends Controller
         return response()->json(['playlists' => $playlists]);
     }
 
+    public function index_song($id) {
+        $playlist = Playlist::find($id);
+
+        if (!$playlist) {
+            return response()->json(['message' => 'Playlist not found'], 404);
+        }
+
+        return response()->json([
+            'playlist' => $playlist->name,
+            'songs' => $playlist->songs
+        ]);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -27,6 +40,24 @@ class PlaylistApiController extends Controller
             'playlist'    => $playlist
         ], 201);
     }
+
+    public function store_song(Request $request, $id)
+    {
+        $playlist = Playlist::find($id);
+
+        if (!$playlist) {
+            return response()->json(['message' => 'Playlist not found'], 404);
+        }
+
+        $request->validate([
+            'song_id' => 'required|exists:songs,id'
+        ]);
+
+        $playlist->songs()->syncWithoutDetaching($request->all());
+
+        return response()->json(['message' => 'Song added successfully'], 200);
+    }
+
 
     public function update(Request $request, $id)
     {
@@ -64,4 +95,29 @@ class PlaylistApiController extends Controller
             'id'      => $id
         ], 410);
     }
+
+    public function destroy_song($playlist_id, $id)
+    {
+        $playlist = Playlist::find($playlist_id);
+
+        if (!$playlist) {
+            return response()->json(['message' => 'Playlist not found'], 404);
+        }
+
+        $pivot = $playlist->songs()
+            ->wherePivot('id', $id)
+            ->first();
+
+        if (!$pivot) {
+            return response()->json(['message' => 'Song not found in playlist'], 404);
+        }
+
+        $playlist->songs()->detach($pivot->id);
+
+        return response()->json([
+            'message' => 'Song removed from playlist',
+            'id' => $id
+        ], 200);
+    }
+
 }
