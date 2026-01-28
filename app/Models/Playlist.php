@@ -22,4 +22,11 @@ class Playlist extends Model
     {
         return $this->belongsToMany(Song::class, 'songs_playlists', 'playlist_id', 'song_id')->withPivot('id');
     }
+
+    protected static function booted()
+    {
+        static::deleting(function ($playlist) {
+            $playlist->songs()->detach();
+        });
+    }
 }
