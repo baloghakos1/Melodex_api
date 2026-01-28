@@ -23,7 +23,7 @@ class ArtistApiController extends Controller
         }
         return response()->json(['artist' => $artist]);
     }
-    
+
     public function index_album($id)
     {
         $artist = Artist::find($id);

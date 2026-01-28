@@ -119,5 +119,4 @@ class PlaylistApiController extends Controller
             'id' => $id
         ], 200);
     }
-
 }
