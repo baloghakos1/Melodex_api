@@ -15,6 +15,7 @@ class Artist extends Model
         'nationality',
         'image',
         'description',
+        'audius_id',
     ];
 
     function album()

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('songs', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('lyrics')->nullable();
+            $table->text('lyrics')->nullable();
             $table->unsignedBigInteger('album_id');
             $table->foreign('album_id')->references('id')->on('albums');
             $table->text(column:'stream_url');

@@ -7,15 +7,13 @@ use App\Http\Controllers\SongApiController;
 use App\Http\Controllers\ArtistApiController;
 use App\Http\Controllers\AlbumApiController;
 use App\Http\Controllers\AudiusController;
-use App\Http\Controllers\JamendoController;
-use App\Http\Controllers\MusicBrainzController;
 
 //--Import--
 Route::get('audius/import/{id}', [AudiusController::class, 'importTrack']);
 Route::get('audius/import-all/{query?}', [AudiusController::class, 'importAll']);
+Route::get('audius/import-artist/{id}', [AudiusController::class, 'importArtist']);
+Route::get('audius/sync-all-artists', [AudiusController::class, 'syncAllArtistsFromDatabase']);
 Route::post('audius/import/bulk', [AudiusController::class, 'bulkImport']);
-Route::get('jamendo/import/{id}', [JamendoController::class, 'importTrack']);
-Route::get('musicbrainz/import/{id}', [MusicBrainzController::class, 'importRecording']);
 //--Artist--
 Route::get('/artists', [ArtistApiController::class, 'index']);
 Route::get('/artist/{id}', [ArtistApiController::class, 'single_index']);
