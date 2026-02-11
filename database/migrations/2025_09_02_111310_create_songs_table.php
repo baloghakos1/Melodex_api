@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name', length: 100);
             $table->text('lyrics')->nullable();
-            $table->string('songwriter', length: 100);
             $table->unsignedBigInteger('album_id');
             $table->foreign('album_id')->references('id')->on('albums');
+            $table->text(column:'stream_url');
         });
     }
 

@@ -23,7 +23,54 @@ class ArtistApiController extends Controller
         }
         return response()->json(['artist' => $artist]);
     }
-    
+    /**
+     * @api {get} /api/artists/:id/albums Get albums of an artist
+     * @apiName GetArtistAlbums
+     * @apiGroup Artist
+     *
+     * @apiParam {Number} id Artist unique ID.
+     *
+     * @apiSuccess {String} artist Name of the artist.
+     * @apiSuccess {Object[]} albums List of albums by the artist.
+     * @apiSuccess {Number} albums.id Album ID.
+     * @apiSuccess {String} albums.name Album name.
+     * @apiSuccess {String} [albums.cover] Album cover image URL (optional).
+     * @apiSuccess {String} albums.year Year the album was released.
+     * @apiSuccess {String} albums.genre Album genre.
+     * @apiSuccess {Number} albums.artist_id ID of the associated artist.
+     *
+     * @apiSuccessExample {json} Success Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "artist": "The Beatles",
+     *   "albums": [
+     *     {
+     *       "id": 1,
+     *       "name": "Abbey Road",
+     *       "cover": "abbey_road.jpg",
+     *       "year": "1969",
+     *       "genre": "Rock",
+     *       "artist_id": 1
+     *     },
+     *     {
+     *       "id": 2,
+     *       "name": "Sgt. Pepper's Lonely Hearts Club Band",
+     *       "cover": "sgt_pepper.jpg",
+     *       "year": "1967",
+     *       "genre": "Rock",
+     *       "artist_id": 1
+     *     }
+     *   ]
+     * }
+     *
+     * @apiError {String} message Error message.
+     *
+     * @apiErrorExample {json} Artist Not Found:
+     * HTTP/1.1 404 Not Found
+     * {
+     *   "message": "Artist not found"
+     * }
+     */
     public function index_album($id)
     {
         $artist = Artist::find($id);
@@ -82,16 +129,69 @@ class ArtistApiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:100',
-            'nationality' => 'required|string|max:100',
+            'name' => 'required|string|max:255',
+            'nationality' => 'nullable|string|max:255',
             'image' => 'nullable|string',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
         ]);
 
         $artist = Artist::create($request->all());
         return response()->json(['message' => 'Artist created successfully', 'artist' => $artist], 201);
     }
-
+    /**
+     * @api {post} /api/artists/:id/albums Add a new album for an artist
+     * @apiName CreateAlbum
+     * @apiGroup Album
+     *
+     * @apiParam {Number} id Artist unique ID.
+     *
+     * @apiBody {String} name Album name (required).
+     * @apiBody {String} [cover] Album cover image URL (optional).
+     * @apiBody {Number} year Year the album was released (required).
+     * @apiBody {String} genre Album genre (required).
+     *
+     * @apiSuccess {String} message Success message.
+     * @apiSuccess {Object} album Created album data.
+     * @apiSuccess {Number} album.id Album ID.
+     * @apiSuccess {String} album.name Album name.
+     * @apiSuccess {String} [album.cover] Album cover image URL (optional).
+     * @apiSuccess {Number} album.year Year the album was released.
+     * @apiSuccess {String} album.genre Album genre.
+     * @apiSuccess {Number} album.artist_id ID of the associated artist.
+     *
+     * @apiSuccessExample {json} Success Response:
+     * HTTP/1.1 201 Created
+     * {
+     *   "message": "Album created successfully",
+     *   "album": {
+     *     "id": 1,
+     *     "name": "Abbey Road",
+     *     "cover": "abbey_road.jpg",
+     *     "year": 1969,
+     *     "genre": "Rock",
+     *     "artist_id": 1
+     *   }
+     * }
+     *
+     * @apiError {String} message Error message.
+     *
+     * @apiErrorExample {json} Artist Not Found:
+     * HTTP/1.1 404 Not Found
+     * {
+     *   "message": "Artist not found"
+     * }
+     *
+     * @apiErrorExample {json} Validation Error:
+     * HTTP/1.1 422 Unprocessable Entity
+     * {
+     *   "message": "The given data was invalid.",
+     *   "errors": {
+     *     "name": ["The name field is required."],
+     *     "year": ["The year field is required."],
+     *     "genre": ["The genre field is required."]
+     *   }
+     * }
+     */
     public function store_album(Request $request, $id)
     {
         $artist = Artist::find($id);
@@ -129,9 +229,10 @@ class ArtistApiController extends Controller
 
 
         $request->validate([
-            'name' => 'required|string|max:100',
-            'songwriter' => 'required|string|max:100',
+            'name' => 'required|string|max:255',
             'lyrics' => 'nullable|string',
+            'album_id' => 'required|integer',
+            'stream_url' => 'required|string',
         ]);
 
         $song = $album->songs()->create($request->all());
@@ -159,7 +260,66 @@ class ArtistApiController extends Controller
 
         return response()->json(['message' => 'Artist updated successfully', 'artist' => $artist]);
     }
-
+    /**
+     * @api {put} /api/artists/:artist_id/albums/:id Update an album of an artist
+     * @apiName UpdateAlbum
+     * @apiGroup Album
+     *
+     * @apiParam {Number} artist_id Artist unique ID.
+     * @apiParam {Number} id Album unique ID.
+     *
+     * @apiBody {String} [name] Album name.
+     * @apiBody {String} [cover] Album cover image URL.
+     * @apiBody {Number} [year] Album release year.
+     * @apiBody {String} [genre] Album genre.
+     *
+     * @apiSuccess {String} message Success message.
+     * @apiSuccess {Object} album Updated album data.
+     * @apiSuccess {Number} album.id Album ID.
+     * @apiSuccess {String} album.name Album name.
+     * @apiSuccess {String} [album.cover] Album cover image URL (optional).
+     * @apiSuccess {Number} album.year Album release year.
+     * @apiSuccess {String} album.genre Album genre.
+     * @apiSuccess {Number} album.artist_id ID of the associated artist.
+     *
+     * @apiSuccessExample {json} Success Response:
+     * HTTP/1.1 200 OK
+     * {
+     *   "message": "Album updated successfully",
+     *   "album": {
+     *     "id": 1,
+     *     "name": "Abbey Road (Updated)",
+     *     "cover": "abbey_road_updated.jpg",
+     *     "year": 1969,
+     *     "genre": "Rock",
+     *     "artist_id": 1
+     *   }
+     * }
+     *
+     * @apiError {String} message Error message.
+     *
+     * @apiErrorExample {json} Artist Not Found:
+     * HTTP/1.1 404 Not Found
+     * {
+     *   "message": "Artist not found"
+     * }
+     *
+     * @apiErrorExample {json} Album Not Found:
+     * HTTP/1.1 404 Not Found
+     * {
+     *   "message": "Album not found for this artist"
+     * }
+     *
+     * @apiErrorExample {json} Validation Error:
+     * HTTP/1.1 422 Unprocessable Entity
+     * {
+     *   "message": "The given data was invalid.",
+     *   "errors": {
+     *     "name": ["The name must be a string."],
+     *     "year": ["The year must be an integer."]
+     *   }
+     * }
+     */
     public function update_album(Request $request, $artist_id, $id)
     {
 
@@ -209,9 +369,10 @@ class ArtistApiController extends Controller
         }
 
         $request->validate([
-            'name' => 'nullable|string|max:100',
-            'songwriter' => 'nullable|string|max:100',
+            'name' => 'nullable|string|max:255',
             'lyrics' => 'nullable|string',
+            'album_id' => 'nullable|integer',
+            'stream_url' => 'nullable|string',
         ]);
 
         $song->update($request->all());
@@ -230,7 +391,38 @@ class ArtistApiController extends Controller
         $artist->delete();
         return response()->json(['message' => 'Artist deleted successfully', 'id' => $id], 410);
     }
-
+    /**
+     * @api {delete} /api/artists/:artist_id/albums/:id Delete an album of an artist
+     * @apiName DeleteAlbum
+     * @apiGroup Album
+     *
+     * @apiParam {Number} artist_id Artist unique ID.
+     * @apiParam {Number} id Album unique ID.
+     *
+     * @apiSuccess {String} message Success message.
+     * @apiSuccess {Number} id Deleted album ID.
+     *
+     * @apiSuccessExample {json} Success Response:
+     * HTTP/1.1 410 Gone
+     * {
+     *   "message": "Album deleted successfully",
+     *   "id": 5
+     * }
+     *
+     * @apiError {String} message Error message.
+     *
+     * @apiErrorExample {json} Artist Not Found:
+     * HTTP/1.1 404 Not Found
+     * {
+     *   "message": "Artist not found"
+     * }
+     *
+     * @apiErrorExample {json} Album Not Found:
+     * HTTP/1.1 404 Not Found
+     * {
+     *   "message": "Album not found"
+     * }
+     */
     public function destroy_album($artist_id, $id)
     {
         $artist = Artist::find($artist_id);

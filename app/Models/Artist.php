@@ -16,9 +16,10 @@ class Artist extends Model
         'nationality',
         'image',
         'description',
+        'audius_id',
     ];
 
-    public function albums()
+    function album()
     {
         return $this->hasMany(Album::class);
     }

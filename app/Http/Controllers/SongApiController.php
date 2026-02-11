@@ -27,10 +27,10 @@ class SongApiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'       => 'required|string|max:100',
-            'songwriter' => 'required|string|max:100',
-            'lyrics'     => 'nullable|string',
-            'album_id'   => 'required|exists:albums,id',
+            'name' => 'required|string|max:255',
+            'lyrics' => 'nullable|string',
+            'album_id' => 'required|integer',
+            'stream_url' => 'required|string',
         ]);
 
         $song = Song::create($request->all());
@@ -43,6 +43,12 @@ class SongApiController extends Controller
 
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'name' => 'nullable|string|max:255',
+            'lyrics' => 'nullable|string',
+            'album_id' => 'nullable|integer',
+            'stream_url' => 'nullable|string|max:255',
+        ]);
         $song = Song::find($id);
 
         if (!$song) {

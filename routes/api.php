@@ -5,8 +5,15 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserApiController;
 use App\Http\Controllers\SongApiController;
 use App\Http\Controllers\ArtistApiController;
-use App\Http\Controllers\MemberApiController;
 use App\Http\Controllers\AlbumApiController;
+use App\Http\Controllers\AudiusController;
+
+//--Import--
+Route::get('audius/import/{id}', [AudiusController::class, 'importTrack']);
+Route::get('audius/import-all/{query?}', [AudiusController::class, 'importAll']);
+Route::get('audius/import-artist/{id}', [AudiusController::class, 'importArtist']);
+Route::get('audius/sync-all-artists', [AudiusController::class, 'syncAllArtistsFromDatabase']);
+Route::post('audius/import/bulk', [AudiusController::class, 'bulkImport']);
 //--Artist--
 Route::get('/artists', [ArtistApiController::class, 'index']);
 Route::get('/artist/{id}', [ArtistApiController::class, 'single_index']);

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Services\AudiusService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,8 +12,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
-    }
+        $this->app->singleton(AudiusService::class);    }
 
     /**
      * Bootstrap any application services.
