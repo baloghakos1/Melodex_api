@@ -78,10 +78,11 @@ class ArtistApiController extends Controller
         if (!$artist) {
             return response()->json(['message' => 'Artist not found'], 404);
         }
+        $albums =Album::where('artist_id', $id)->get();
 
         return response()->json([
             'artist' => $artist->name,
-            'albums' => $artist->albums
+            'albums' => $albums
         ]);
     }
 

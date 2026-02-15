@@ -13,13 +13,8 @@ return new class extends Migration
     {
         Schema::create('artists', function (Blueprint $table) {
             $table->id();
-<<<<<<< HEAD
             $table->string('name', length: 100);
-            $table->string('nationality', 100);
-=======
-            $table->string('name');
-            $table->string('nationality')->nullable();
->>>>>>> musicApi
+            $table->string('nationality', 100)->nullable();
             $table->string('image')->nullable();
             $table->text('description')->nullable();
         });
