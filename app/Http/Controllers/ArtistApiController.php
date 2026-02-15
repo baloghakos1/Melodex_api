@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Artist;
 use App\Models\Album;
+use App\Models\Song;
 use Illuminate\Http\Request;
 
 class ArtistApiController extends Controller
@@ -94,7 +95,7 @@ class ArtistApiController extends Controller
             return response()->json(['message' => 'Artist not found'], 404);
         }
 
-        $album = $artist->albums()->find($id);
+        $album = Album::find($id);
 
         if (!$album) {
             return response()->json(['message' => 'Album not found'], 404);
@@ -114,16 +115,17 @@ class ArtistApiController extends Controller
             return response()->json(['message' => 'Artist not found'], 404);
         }
 
-        $album = $artist->albums()->find($id);
+        $album = Album::find($id);
 
         if (!$album) {
             return response()->json(['message' => 'Album not found'], 404);
         }
+        $songs = Song::where('album_id', $id)->get();
 
         return response()->json([
             'artist' => $artist->name,
             'album' => $album->name,
-            'songs' => $album->songs
+            'songs' => $songs
         ]);
     }
 
