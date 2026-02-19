@@ -62,6 +62,25 @@ class UserApiController extends Controller
 
     }
 
+    public function single_index_playlist($user_id, $id)
+    {
+        $user = User::find($user_id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $playlist = $user->playlists()->find($id);
+
+        if (!$playlist) {
+            return response()->json(['message' => 'Playlist not found'], 404);
+        }
+        return response()->json([
+            'user' => $user->name,
+            'playlist' => $playlist
+        ]);
+    }
+
     public function index_playlist_song(Request $request, $user_id, $id)
     {
         $user = User::find($user_id);

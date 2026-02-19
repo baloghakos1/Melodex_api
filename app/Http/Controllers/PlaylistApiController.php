@@ -13,6 +13,16 @@ class PlaylistApiController extends Controller
         return response()->json(['playlists' => $playlists]);
     }
 
+    public function single_index($id)
+    {
+        $playlist = Playlist::find($id);
+
+        if (!$playlist) {
+            return response()->json(['message' => 'Playlist not found'], 404);
+        }
+        return response()->json(['playlist' => $playlist]);
+    }
+
     public function index_song($id) {
         $playlist = Playlist::find($id);
 

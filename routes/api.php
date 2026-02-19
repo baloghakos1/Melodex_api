@@ -44,6 +44,7 @@ Route::patch('/song/{id}', [SongApiController::class, 'update'])->middleware('au
 Route::delete('/song/{id}', [SongApiController::class, 'destroy'])->middleware('auth:sanctum');
 //--Playlist--
 Route::get('/playlists', [PlaylistApiController::class, 'index']);
+Route::get('/playlist/{id}', [PlaylistApiController::class, 'single_index']);
 Route::post('/playlist', [PlaylistApiController::class, 'store'])->middleware('auth:sanctum');
 Route::patch('/playlist/{id}', [PlaylistApiController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/playlist/{id}', [PlaylistApiController::class, 'destroy'])->middleware('auth:sanctum');
@@ -56,6 +57,7 @@ Route::post('/user/login', [UserApiController::class, 'login']);
 Route::get('/users', [UserApiController::class, 'index'])->middleware('auth:sanctum');
 //--User/Playlist--
 Route::get('/user/{id}/playlists', [UserApiController::class, 'index_playlist'])->middleware('auth:sanctum');
+Route::get('/user/{user_id}/playlist/{id}', [UserApiController::class, 'single_index_playlist'])->middleware('auth:sanctum');
 Route::post('/user/{id}/playlist', [UserApiController::class, 'store_playlist'])->middleware('auth:sanctum');
 Route::patch('/user/{user_id}/playlist/{id}', [UserApiController::class, 'update_playlist'])->middleware('auth:sanctum');
 Route::delete('/user/{user_id}/playlist/{id}', [UserApiController::class, 'destroy_playlist'])->middleware('auth:sanctum');
