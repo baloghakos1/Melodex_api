@@ -57,31 +57,72 @@ class AudiusService
         }
     }
 
-    public function getTrackStreamUrl(string $trackId): ?string
+    public function getArtistAlbums(string $userId): array
+    {
+        try {
+            $host = $this->getHost();
+            $response = $this->client->get("{$host}/v1/users/{$userId}/albums");
+
+            $body = json_decode($response->getBody()->getContents(), true);
+            $albums = $body['data'] ?? [];
+
+            // Only return albums that have at least one track
+            return array_values(array_filter($albums, function ($album) {
+                return isset($album['track_count']) && $album['track_count'] > 0;
+            }));
+        } catch (\Exception $e) {
+            Log::error('Audius API Error (albums): ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getAlbumTracks(string $albumId): array
+    {
+        try {
+            $host = $this->getHost();
+            $response = $this->client->get("{$host}/v1/playlists/{$albumId}/tracks");
+
+            $body = json_decode($response->getBody()->getContents(), true);
+            return $body['data'] ?? [];
+        } catch (\Exception $e) {
+            Log::error('Audius API Error (album tracks): ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getTrackStreamUrl(string $trackId): string
     {
         $host = $this->getHost();
         return "{$host}/v1/tracks/{$trackId}/stream";
     }
 
+    /**
+     * Audius returns full image URLs directly in the artwork object.
+     * e.g. $artwork['1000x1000'] = 'https://...'
+     * Just return it directly — no need to rebuild the URL.
+     */
     public function getImageUrl(?array $artwork, string $size = '1000x1000'): ?string
     {
-        if (!$artwork || !isset($artwork['1000x1000'])) {
+        if (!$artwork) {
             return null;
         }
-        
-        $cid = $artwork['1000x1000'];
-        $host = $this->getHost();
-        return "{$host}/v1/image_upload/{$cid}";
+
+        // Return the size requested, fall back to smaller sizes
+        return $artwork[$size]
+            ?? $artwork['480x480']
+            ?? $artwork['150x150']
+            ?? null;
     }
 
     public function getProfilePictureUrl(?array $profilePicture, string $size = '1000x1000'): ?string
     {
-        if (!$profilePicture || !isset($profilePicture['1000x1000'])) {
+        if (!$profilePicture) {
             return null;
         }
-        
-        $cid = $profilePicture['1000x1000'];
-        $host = $this->getHost();
-        return "{$host}/v1/image_upload/{$cid}";
+
+        return $profilePicture[$size]
+            ?? $profilePicture['480x480']
+            ?? $profilePicture['150x150']
+            ?? null;
     }
 }
