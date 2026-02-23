@@ -66,9 +66,9 @@ class AudiusService
             $body = json_decode($response->getBody()->getContents(), true);
             $albums = $body['data'] ?? [];
 
-            // Only return albums that have at least one track
+            // Only return albums that have at least one track in playlist_contents
             return array_values(array_filter($albums, function ($album) {
-                return isset($album['track_count']) && $album['track_count'] > 0;
+                return !empty($album['playlist_contents']);
             }));
         } catch (\Exception $e) {
             Log::error('Audius API Error (albums): ' . $e->getMessage());
