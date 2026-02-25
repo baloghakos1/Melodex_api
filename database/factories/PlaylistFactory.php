@@ -2,16 +2,19 @@
 
 namespace Database\Factories;
 
-use App\Models\Member;  // ne felejtse el importálni
-use App\Models\Artist;
+use App\Models\Playlist;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class MemberFactory extends Factory
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Playlist>
+ */
+class PlaylistFactory extends Factory
 {
 
     use RefreshDatabase;
-    protected $model = Member::class;
+    protected $model = Playlist::class;
     /**
      * Define the model's default state.
      *
@@ -21,8 +24,7 @@ class MemberFactory extends Factory
 	{
 		return [
 			'name' => $this->faker->unique()->word(),
-            'instrument' => $this->faker->unique()->word(),
-            'year' => $this->faker->unique()->word(),
+            'user_id' => User::factory()
 		];
 	}
 }

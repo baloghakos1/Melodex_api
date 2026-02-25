@@ -27,6 +27,76 @@ class ArtistControllerTest extends TestCase
             ->assertJsonFragment(['name' => 'BLACKPINK']);
     }
 
+    public function test_single_index_returns_single_artist()
+    {
+        $artist = Artist::factory()->create([
+            'name' => 'BLACKPINK',
+        ]);
+
+        $response = $this->getJson("/api/artist/{$artist->id}");
+
+        $response->assertStatus(200)
+            ->assertJsonFragment([
+                'id' => $artist->id,
+                'name' => 'BLACKPINK',
+            ]);
+    }
+
+    public function test_single_index_returns_404_for_missing_artist()
+    {
+        $response = $this->getJson('/api/artist/9999');
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Artist not found']);
+    }
+
+    public function test_single_index_album_returns_single_album()
+    {
+        $artist = Artist::factory()->create([
+            'name' => 'BLACKPINK',
+        ]);
+
+        $album = Album::factory()->create([
+            'artist_id' => $artist->id,
+        ]);
+
+        $response = $this->getJson("/api/artist/{$artist->id}/album/{$album->id}");
+
+        $response->assertStatus(200);
+
+        $response->assertJsonFragment([
+            'artist' => 'BLACKPINK',
+        ]);
+
+        $response->assertJsonFragment([
+            'id' => $album->id,
+            'name' => $album->name,
+            'cover' => $album->cover,
+            'year' =>$album->year,
+            'genre' => $album->genre,
+            'artist_id' => $artist->id
+        ]);
+    }
+
+    public function test_single_index_album_returns_404_for_missing_artist()
+    {
+        $response = $this->getJson('/api/artist/9999/album/1');
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Artist not found']);
+    }
+
+    public function test_single_index_album_returns_404_for_missing_album()
+    {
+        $artist = Artist::factory()->create([
+            'name' => 'BLACKPINK',
+        ]);
+        $response = $this->getJson("/api/artist/{$artist->id}/album/9999");
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Album not found']);
+    }
+
     public function test_index_albums_returns_all_artist_albums()
     {
         $artist = Artist::factory()->create(['name' => 'Taylor Swift']);
@@ -52,11 +122,14 @@ class ArtistControllerTest extends TestCase
             ]);
         }
     }
+
     public function test_index_albums_returns_404_for_missing_artist() {
         $response = $this->getJson("/api/artist/9999/albums");
         $response->assertStatus(404)
             ->assertJsonFragment(['message' => 'Artist not found']);
     }
+
+
 
     public function test_index_songs_returns_all_artist_album_songs()
     {
@@ -102,48 +175,6 @@ class ArtistControllerTest extends TestCase
             ->assertJsonFragment(['message' => 'Album not found']);
     }
 
-    public function test_index_members_returns_all_artist_members()
-    {
-        $artist = Artist::factory()->create(['name' => 'Taylor Swift']);
-        $members = Member::factory()->count(3)->create([
-            'artist_id' => $artist->id,
-        ]);
-
-        $response = $this->getJson("/api/artist/{$artist->id}/members");
-
-        $response->assertStatus(200);
-
-        $response->assertJsonFragment([
-            'artist' => 'Taylor Swift',
-        ]);
-
-        foreach ($members as $member) {
-            $response->assertJsonFragment([
-                'id' => $member->id,
-                'name' => $member->name,
-                'instrument' => $member->instrument,
-                'year' => $member->year,
-                'artist_id' => $artist->id,
-                'image' => $member->image
-            ]);
-        }
-    }
-
-    public function test_index_members_returns_404_for_missing_artist() {
-        $response = $this->getJson("/api/artist/9999/members");
-        $response->assertStatus(404)
-            ->assertJsonFragment(['message' => 'Artist not found']);
-    }
-
-    public function test_index_members_returns_400_for_not_a_band() {
-        Artist::factory()->create([
-            'id' => 1,
-            'is_band' => 'no',
-        ]);
-        $response = $this->getJson("/api/artist/1/members");
-        $response->assertStatus(400)
-            ->assertJsonFragment(['message' => 'Artist is not a band']);
-    }
 
     public function test_index_filters_by_needle()
     {
@@ -171,7 +202,6 @@ class ArtistControllerTest extends TestCase
             'name' => 'Bob',
             'nationality' => 'Hungarian',
             'description' => 'asd',
-            'is_band' => 'no'
         ]);
 
         $response->assertStatus(201)
@@ -182,82 +212,7 @@ class ArtistControllerTest extends TestCase
             'name' => 'Bob',
             'nationality' => 'Hungarian',
             'description' => 'asd',
-            'is_band' => 'no'
         ]);
-    }
-
-    public function test_store_member_creates_new_member()
-    {
-		$user = User::factory()->create();
-        $token = $user->createToken('TestToken')->plainTextToken;
-        $artist = Artist::factory()->create([
-            'name' => 'Taylor Swift',
-            'id' => 1,
-            'is_band' => 'yes',
-        ]);
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->postJson("/api/artist/{$artist->id}/member", [
-            'name' => 'Bob',
-            'instrument' => 'Vocals',
-            'year' => '2000',
-            'artist_id' => $artist->id
-        ]);
-
-        $response->assertStatus(201)
-            ->assertJsonFragment(['name' => 'Bob']);
-
-        $this->assertDatabaseHas('members',
-        [
-            'name' => 'Bob',
-            'instrument' => 'Vocals',
-            'year' => '2000',
-            'artist_id' => $artist->id
-        ]);
-    }
-
-    public function test_store_member_returns_404_for_missing_artist()
-    {
-		$user = User::factory()->create();
-        $token = $user->createToken('TestToken')->plainTextToken;
-        $artist = Artist::factory()->create([
-            'name' => 'Taylor Swift',
-            'id' => 1,
-            'is_band' => 'yes',
-        ]);
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->postJson("/api/artist/{9999}/member", [
-            'name' => 'Bob',
-            'instrument' => 'Vocals',
-            'year' => '2000',
-            'artist_id' => $artist->id
-        ]);
-
-        $response->assertStatus(404)
-            ->assertJsonFragment(['message' => 'Artist not found']);
-    }
-
-    public function test_store_member_returns_400_for_not_a_band()
-    {
-		$user = User::factory()->create();
-        $token = $user->createToken('TestToken')->plainTextToken;
-        $artist = Artist::factory()->create([
-            'name' => 'Taylor Swift',
-            'id' => 1,
-            'is_band' => 'no',
-        ]);
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->postJson("/api/artist/{$artist->id}/member", [
-            'name' => 'Bob',
-            'instrument' => 'Vocals',
-            'year' => '2000',
-            'artist_id' => $artist->id
-        ]);
-
-        $response->assertStatus(400)
-            ->assertJsonFragment(['message' => 'Artist is not a band']);
     }
 
     public function test_store_album_creates_new_album()
@@ -267,7 +222,6 @@ class ArtistControllerTest extends TestCase
         $artist = Artist::factory()->create([
             'name' => 'Taylor Swift',
             'id' => 1,
-            'is_band' => 'yes',
         ]);
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
@@ -424,85 +378,6 @@ class ArtistControllerTest extends TestCase
             ->assertJsonFragment(['message' => 'Artist not found']);
     }
 
-    public function test_update_member_modifies_existing_member()
-    {
-        $artist = Artist::factory()->create([
-            'name' => 'Taylor Swift',
-            'id' => 1,
-            'is_band' => 'yes',
-        ]);
-        $member = Member::factory()->create([
-            'name' => 'Bob',
-            'artist_id'=> $artist->id
-        ]);
-        $user = User::factory()->create();
-        $token = $user->createToken('TestToken')->plainTextToken;
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->patchJson("/api/artist/{$artist->id}/member/{$member->id}", [
-            'name' => 'Asd'
-        ]);
-
-        $response->assertStatus(200)
-            ->assertJsonFragment(['name' => 'Asd']);
-
-        $this->assertDatabaseHas('members', ['id' => $member->id, 'name' => 'Asd']);
-    }
-
-    public function test_update_member_returns_404_for_missing_artist()
-    {
-        $user = User::factory()->create();
-        $token = $user->createToken('TestToken')->plainTextToken;
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->patchJson('/api/artist/999/member/1', [
-            'name' => 'Bob Marley'
-        ]);
-
-        $response->assertStatus(404)
-            ->assertJsonFragment(['message' => 'Artist not found']);
-    }
-
-    public function test_update_member_returns_400_for_not_a_band()
-    {
-        $artist = Artist::factory()->create([
-            'name' => 'Taylor Swift',
-            'id' => 1,
-            'is_band' => 'no',
-        ]);
-        $user = User::factory()->create();
-        $token = $user->createToken('TestToken')->plainTextToken;
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->patchJson("/api/artist/{$artist->id}/member/1", [
-            'name' => 'Bob Marley'
-        ]);
-
-        $response->assertStatus(400)
-            ->assertJsonFragment(['message' => 'Artist is not a band']);
-    }
-
-    public function test_update_member_returns_404_for_missing_member()
-    {
-        $artist = Artist::factory()->create([
-            'name' => 'Taylor Swift',
-            'id' => 1,
-            'is_band' => 'yes',
-        ]);
-        $user = User::factory()->create();
-        $token = $user->createToken('TestToken')->plainTextToken;
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->patchJson("/api/artist/{$artist->id}/member/9999", [
-            'name' => 'Bob Marley'
-        ]);
-
-        $response->assertStatus(404)
-            ->assertJsonFragment(['message' => 'Member not found']);
-    }
 
     public function test_update_album_modifies_existing_album()
     {
@@ -677,83 +552,6 @@ class ArtistControllerTest extends TestCase
             ->assertJsonFragment(['message' => 'Artist not found']);
     }
 
-    public function test_delete_member_removes_member()
-    {
-        $user = User::factory()->create();
-        $token = $user->createToken('TestToken')->plainTextToken;
-        $artist = Artist::factory()->create([
-            'name' => 'Taylor Swift',
-            'id' => 1,
-            'is_band' => 'yes',
-        ]);
-        $member = Member::factory()->create([
-            'name' => 'Bob',
-            'artist_id'=> $artist->id
-        ]);
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->deleteJson("/api/artist/{$artist->id}/member/{$member->id}");
-
-        $response->assertStatus(410)
-            ->assertJsonFragment(['message' => 'Member deleted successfully']);
-
-        $this->assertDatabaseMissing('members', ['id' => $member->id]);
-    }
-
-    public function test_delete_member_returns_404_for_missing_artist()
-    {
-        $user = User::factory()->create();
-        $token = $user->createToken('TestToken')->plainTextToken;
-        $artist = Artist::factory()->create(['name' => 'Taylor Swift']);
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->deleteJson("/api/artist/99999/member/1");
-
-        $response->assertStatus(404)
-            ->assertJsonFragment(['message' => 'Artist not found']);
-    }
-
-    public function test_delete_member_returns_404_for_missing_member()
-    {
-        $user = User::factory()->create();
-        $token = $user->createToken('TestToken')->plainTextToken;
-        $artist = Artist::factory()->create([
-            'name' => 'Taylor Swift',
-            'id' => 1,
-            'is_band' => 'yes',
-        ]);
-
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->deleteJson("/api/artist/{$artist->id}/member/999999");
-
-        $response->assertStatus(404)
-            ->assertJsonFragment(['message' => 'Member not found']);
-    }
-
-    public function test_delete_member_returns_400_for_not_a_band()
-    {
-        $user = User::factory()->create();
-        $token = $user->createToken('TestToken')->plainTextToken;
-        $artist = Artist::factory()->create([
-            'name' => 'Taylor Swift',
-            'id' => 1,
-            'is_band' => 'no',
-        ]);
-        $member = Member::factory()->create([
-            'name' => 'Bob',
-            'artist_id'=> $artist->id
-        ]);
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->deleteJson("/api/artist/{$artist->id}/member/{$member->id}");
-
-        $response->assertStatus(400)
-            ->assertJsonFragment(['message' => 'Artist is not a band']);
-    }
 
     public function test_delete_album_removes_album()
     {

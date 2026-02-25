@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Artist;  // ne felejtse el importálni
+use App\Models\Artist;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -24,7 +24,6 @@ class ArtistFactory extends Factory
 		return [
 			'name' => $this->faker->unique()->word(),
             'nationality' => $this->faker->unique()->word(),
-            'is_band' => $this->faker->unique()->word()
 		];
 	}
 }

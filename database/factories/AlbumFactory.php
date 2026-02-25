@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Album;  // ne felejtse el importálni
+use App\Models\Album;
 use App\Models\Artist;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
