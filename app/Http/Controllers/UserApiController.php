@@ -113,15 +113,18 @@ class UserApiController extends Controller
         }
 
         $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('playlists')->where(function ($query) use ($id) {
-                    return $query->where('user_id', $id);
-                }),
-            ],
+            'name' => 'required|string|max:100',
         ]);
+
+        $existing = $user->playlists()
+            ->where('name', $request->name)
+            ->first();
+
+        if ($existing) {
+            return response()->json([
+                'message' => 'Playlist already exists'
+            ], 409);
+        }
 
         $playlist = $user->playlists()->create([
             'name' => $request->name,
