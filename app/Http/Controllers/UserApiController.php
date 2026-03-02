@@ -122,7 +122,7 @@ class UserApiController extends Controller
 
         if ($existing) {
             return response()->json([
-                'message' => 'Playlist already exists'
+                'message' => 'Playlist with this name already exists'
             ], 409);
         }
 
@@ -154,9 +154,23 @@ class UserApiController extends Controller
             'song_id' => 'required|exists:songs,id'
         ]);
 
-        $playlist->songs()->syncWithoutDetaching($request->all());
+        $songId = $request->song_id;
 
-        return response()->json(['message' => 'Song added successfully'], 200);
+        $alreadyExists = $playlist->songs()
+            ->where('songs.id', $songId)
+            ->exists();
+
+        if ($alreadyExists) {
+            return response()->json([
+                'message' => 'Song already exists in playlist'
+            ], 409);
+        }
+
+        $playlist->songs()->attach($songId);
+
+        return response()->json([
+            'message' => 'Song added successfully'
+        ], 201);
     }
 
 
@@ -175,22 +189,30 @@ class UserApiController extends Controller
         }
 
         $request->validate([
-            'name' => [
-                'nullable',
-                'string',
-                'max:100',
-                Rule::unique('playlists')
-                    ->where(fn ($query) => $query->where('user_id', $user_id))
-                    ->ignore($playlist->id),
-            ],
+            'name' => 'nullable|string|max:100',
         ]);
 
-        $playlist->update($request->only('name'));
+        $newName = $request->name ?? $playlist->name;
+
+        $alreadyExists = $user->playlists()
+            ->where('name', $newName)
+            ->where('id', '!=', $playlist->id)
+            ->exists();
+
+        if ($alreadyExists) {
+            return response()->json([
+                'message' => 'Playlist with this name already exists'
+            ], 409);
+        }
+
+        $playlist->update([
+            'name' => $newName
+        ]);
 
         return response()->json([
             'message' => 'Playlist updated successfully',
             'playlist' => $playlist
-        ]);
+        ], 200);
     }
 
     public function destroy_playlist($user_id, $id)

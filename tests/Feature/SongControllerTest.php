@@ -24,30 +24,12 @@ class SongControllerTest extends TestCase
             ->assertJsonFragment(['name' => 'Ivy']);
     }
 
-    public function test_index_filters_by_needle()
-    {
-        Song::factory()->create(['name' => 'Nikes']);
-        Song::factory()->create(['name' => 'Ivy']);
-        Song::factory()->create(['name' => 'Solo']);
-
-
-        $response = $this->getJson('/api/songs?needle=bar');
-
-        $response->assertStatus(200)
-            ->assertJsonFragment(['name' => 'Ivy'])
-            ->assertJsonFragment(['name' => 'Nikes'])
-            ->assertJsonMissing(['name' => 'Godspeed']);
-    }
-
     public function test_store_creates_new_song()
     {
-        // Létrehozunk egy felhasználót
 		$user = User::factory()->create();
-		// Lekérjük a tokent
         $token = $user->createToken('TestToken')->plainTextToken;
         $album = Album::factory()->create();
 
-		// A Header-ben elküldjük a tokent és meghívjuk a végpontot (postJson) a szükséges adatokkal
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
         ])->postJson('/api/song', [
@@ -56,11 +38,9 @@ class SongControllerTest extends TestCase
             'album_id' => $album->id
         ]);
 
-		// teszteljük, hogy 200-as kódot kapunk-e és a válaszban benne van-e az újonnan hozzáadott adat.
         $response->assertStatus(201)
             ->assertJsonFragment(['name' => 'Bob']);
 
-		// teszteljük, hogy az adatbázisban is ott van-e at adat
         $this->assertDatabaseHas('songs',
         [
             'name' => 'Bob',

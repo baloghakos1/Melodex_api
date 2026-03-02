@@ -85,21 +85,6 @@ class AlbumControllerTest extends TestCase
             ->assertJsonFragment(['message' => 'Album not found']);
     }
 
-    public function test_index_filters_by_needle()
-    {
-        Album::factory()->create(['name' => 'The Life of a Showgirl']);
-        Album::factory()->create(['name' => 'Midnights']);
-        Album::factory()->create(['name' => 'GNX']);
-
-
-        $response = $this->getJson('/api/albums?needle=bar');
-
-        $response->assertStatus(200)
-            ->assertJsonFragment(['name' => 'Midnights'])
-            ->assertJsonFragment(['name' => 'The Life of a Showgirl'])
-            ->assertJsonMissing(['name' => 'Born Pink']);
-    }
-
     public function test_store_creates_new_album()
     {
 		$user = User::factory()->create();

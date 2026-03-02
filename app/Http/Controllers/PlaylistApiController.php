@@ -39,15 +39,28 @@ class PlaylistApiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'       => 'required|string|max:100',
-            'user_id'   => 'required|exists:users,id',
+            'name'     => 'required|string|max:100',
+            'user_id'  => 'required|exists:users,id',
         ]);
 
-        $playlist = Playlist::create($request->all());
+        $alreadyExists = Playlist::where('user_id', $request->user_id)
+            ->where('name', $request->name)
+            ->exists();
+
+        if ($alreadyExists) {
+            return response()->json([
+                'message' => 'Playlist with this name already exists for this user'
+            ], 409);
+        }
+
+        $playlist = Playlist::create([
+            'name' => $request->name,
+            'user_id' => $request->user_id,
+        ]);
 
         return response()->json([
             'message' => 'Playlist created successfully',
-            'playlist'    => $playlist
+            'playlist' => $playlist
         ], 201);
     }
 
@@ -63,9 +76,23 @@ class PlaylistApiController extends Controller
             'song_id' => 'required|exists:songs,id'
         ]);
 
-        $playlist->songs()->syncWithoutDetaching($request->all());
+        $songId = $request->song_id;
 
-        return response()->json(['message' => 'Song added successfully'], 200);
+        $alreadyExists = $playlist->songs()
+            ->where('songs.id', $songId)
+            ->exists();
+
+        if ($alreadyExists) {
+            return response()->json([
+                'message' => 'Song already exists in playlist'
+            ], 409);
+        }
+
+        $playlist->songs()->attach($songId);
+
+        return response()->json([
+            'message' => 'Song added successfully'
+        ], 201);
     }
 
 
@@ -78,16 +105,30 @@ class PlaylistApiController extends Controller
         }
 
         $request->validate([
-            'name'       => 'nullable|string|max:100',
-            'user_id'   => 'nullable|exists:users,id',
+            'name'    => 'nullable|string|max:100',
+            'user_id' => 'nullable|exists:users,id',
         ]);
 
-        $playlist->update($request->all());
+        $newName = $request->name ?? $playlist->name;
+        $newUserId = $request->user_id ?? $playlist->user_id;
+
+        $alreadyExists = Playlist::where('user_id', $newUserId)
+            ->where('name', $newName)
+            ->where('id', '!=', $playlist->id)
+            ->exists();
+
+        if ($alreadyExists) {
+            return response()->json([
+                'message' => 'Playlist with this name already exists for this user'
+            ], 409);
+        }
+
+        $playlist->update($request->only(['name', 'user_id']));
 
         return response()->json([
             'message' => 'Playlist updated successfully',
-            'playlist'    => $playlist
-        ]);
+            'playlist' => $playlist
+        ], 200);
     }
 
     public function destroy($id)

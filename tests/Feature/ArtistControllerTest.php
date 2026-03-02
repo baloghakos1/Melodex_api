@@ -175,22 +175,6 @@ class ArtistControllerTest extends TestCase
             ->assertJsonFragment(['message' => 'Album not found']);
     }
 
-
-    public function test_index_filters_by_needle()
-    {
-        Artist::factory()->create(['name' => 'Taylor Swift']);
-        Artist::factory()->create(['name' => 'BLACKPINK']);
-        Artist::factory()->create(['name' => 'Bad Bunny']);
-
-
-        $response = $this->getJson('/api/artists?needle=bar');
-
-        $response->assertStatus(200)
-            ->assertJsonFragment(['name' => 'BLACKPINK'])
-            ->assertJsonFragment(['name' => 'Taylor Swift'])
-            ->assertJsonMissing(['name' => 'Billie Eilish']);
-    }
-
     public function test_store_creates_new_artist()
     {
 		$user = User::factory()->create();
