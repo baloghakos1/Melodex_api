@@ -86,13 +86,19 @@ class UserApiController extends Controller
         $user = User::find($user_id);
 
         if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
+            return response()->json([
+                'message' => 'User not found'
+            ], 404);
         }
 
-        $playlist = $user->playlists()->find($id);
+        $playlist = $user->playlists()
+            ->with('songs.album.artist')
+            ->find($id);
 
         if (!$playlist) {
-            return response()->json(['message' => 'Playlist not found'], 404);
+            return response()->json([
+                'message' => 'Playlist not found'
+            ], 404);
         }
 
         return response()->json([
@@ -100,7 +106,6 @@ class UserApiController extends Controller
             'playlist' => $playlist->name,
             'songs' => $playlist->songs
         ]);
-
     }
 
 
