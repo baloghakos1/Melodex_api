@@ -15,7 +15,7 @@ class SearchController extends Controller
 
         $searchResults = (new Search())
             ->registerModel(Artist::class, 'name') 
-            ->registerModel(Album::class, 'name')         
+            ->registerModel(Album::class, 'name','genre')         
             ->registerModel(Song::class, 'name')         
             ->search($term);
 
