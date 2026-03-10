@@ -6,6 +6,7 @@ use App\Http\Controllers\UserApiController;
 use App\Http\Controllers\SongApiController;
 use App\Http\Controllers\ArtistApiController;
 use App\Http\Controllers\AlbumApiController;
+use App\Http\Controllers\SearchController;
 
 //--Artist--
 Route::get('/artists', [ArtistApiController::class, 'index']);
@@ -44,3 +45,5 @@ Route::delete('/song/{id}', [SongApiController::class, 'destroy'])->middleware('
 //--User--
 Route::post('/user/login', [UserApiController::class, 'login']);
 Route::get('/users', [UserApiController::class, 'index'])->middleware('auth:sanctum');
+//--Search--
+Route::get('/search', [SearchController::class, 'index']);

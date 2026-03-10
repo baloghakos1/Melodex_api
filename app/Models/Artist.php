@@ -4,8 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Searchable\Searchable;
+use Spatie\Searchable\SearchResult;
 
-class Artist extends Model
+class Artist extends Model implements Searchable
 {
     use HasFactory;
 
@@ -31,5 +33,9 @@ class Artist extends Model
                 $album->delete();
             });
         });
+    }
+    public function getSearchResult(): SearchResult
+    {
+        return new SearchResult($this, $this->name); 
     }
 }
