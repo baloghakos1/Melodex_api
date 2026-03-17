@@ -180,7 +180,7 @@ class UserControllerTest extends TestCase {
                 'id' => $song->id,
                 'name' => $song->name,
                 'lyrics' => $song->lyrics,
-                'songwriter' => $song->songwriter,
+                'stream_url' => $song->stream_url,
             ]);
 
             $this->assertDatabaseHas('songs_playlists', [

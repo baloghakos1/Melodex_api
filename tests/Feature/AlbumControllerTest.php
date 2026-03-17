@@ -71,8 +71,8 @@ class AlbumControllerTest extends TestCase
                 'id' => $song->id,
                 'name' => $song->name,
                 'lyrics' => $song->lyrics,
-                'songwriter' => $song->songwriter,
-                'album_id' => $album->id
+                'album_id' => $album->id,
+                'stream_url' => $song->stream_url
             ]);
         }
     }
@@ -124,9 +124,9 @@ class AlbumControllerTest extends TestCase
             'Authorization' => 'Bearer ' . $token,
         ])->postJson("/api/album/{$album->id}/song", [
             'name' => 'asd',
-            'songwriter' => 'asd',
             'lyrics' => 'asd',
-            'album_id' => $album->id
+            'album_id' => $album->id,
+            'stream_url' => 'ok'
         ]);
 
         $response->assertStatus(201)
@@ -135,9 +135,9 @@ class AlbumControllerTest extends TestCase
         $this->assertDatabaseHas('songs',
         [
             'name' => 'asd',
-            'songwriter' => 'asd',
             'lyrics' => 'asd',
-            'album_id' => $album->id
+            'album_id' => $album->id,
+            'stream_url' => 'ok'
         ]);
     }
 

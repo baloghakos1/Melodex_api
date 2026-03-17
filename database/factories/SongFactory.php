@@ -20,8 +20,8 @@ class SongFactory extends Factory
 	{
 		return [
 			'name' => $this->faker->unique()->word(),
-            'songwriter' => $this->faker->unique()->word(),
-            'album_id' => Album::factory()
+            'album_id' => Album::factory(),
+            'stream_url' => $this->faker->url(),
 		];
 	}
 }

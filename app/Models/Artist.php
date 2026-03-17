@@ -19,7 +19,7 @@ class Artist extends Model
         'audius_id',
     ];
 
-    function album()
+    function albums()
     {
         return $this->hasMany(Album::class);
     }

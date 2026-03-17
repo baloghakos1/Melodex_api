@@ -156,8 +156,8 @@ class ArtistControllerTest extends TestCase
                 'id' => $song->id,
                 'name' => $song->name,
                 'lyrics' => $song->lyrics,
-                'songwriter' => $song->songwriter,
-                'album_id' => $album->id
+                'album_id' => $album->id,
+                'stream_url' => $song->stream_url
             ]);
         }
     }
@@ -265,7 +265,7 @@ class ArtistControllerTest extends TestCase
             'Authorization' => 'Bearer ' . $token,
         ])->postJson("/api/artist/{$artist->id}/album/{$album->id}/song", [
             'name' => 'Bob',
-            'songwriter' => 'John',
+            'stream_url' => 'ok',
             'album_id' => $album->id
         ]);
 
@@ -275,7 +275,7 @@ class ArtistControllerTest extends TestCase
         $this->assertDatabaseHas('songs',
         [
             'name' => 'Bob',
-            'songwriter' => 'John',
+            'stream_url' => 'ok',
             'album_id' => $album->id
         ]);
     }
@@ -294,9 +294,9 @@ class ArtistControllerTest extends TestCase
         ]);
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->postJson("/api/artist/{9999}/album/{1}/song", [
+        ])->postJson("/api/artist/9999/album/1/song", [
             'name' => 'Bob',
-            'songwriter' => 'John',
+            'stream_url' => 'ok',
             'album_id' => $album->id
         ]);
 
@@ -318,9 +318,9 @@ class ArtistControllerTest extends TestCase
         ]);
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->postJson("/api/artist/{$artist->id}/album/{99999}/song", [
+        ])->postJson("/api/artist/{$artist->id}/album/99999/song", [
             'name' => 'Bob',
-            'songwriter' => 'John',
+            'stream_url' => 'ok',
             'album_id' => $album->id
         ]);
 

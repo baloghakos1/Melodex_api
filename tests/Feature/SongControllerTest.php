@@ -34,7 +34,7 @@ class SongControllerTest extends TestCase
             'Authorization' => 'Bearer ' . $token,
         ])->postJson('/api/song', [
             'name' => 'Bob',
-            'songwriter' => 'asd',
+            'stream_url' => 'asd',
             'album_id' => $album->id
         ]);
 
@@ -44,7 +44,7 @@ class SongControllerTest extends TestCase
         $this->assertDatabaseHas('songs',
         [
             'name' => 'Bob',
-            'songwriter' => 'asd',
+            'stream_url' => 'asd',
             'album_id' => $album->id
         ]);
     }
