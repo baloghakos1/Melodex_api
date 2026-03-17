@@ -72,6 +72,7 @@ class ArtistApiController extends Controller
      *   "message": "Artist not found"
      * }
      */
+
     public function index_album($id)
     {
         $artist = Artist::find($id);

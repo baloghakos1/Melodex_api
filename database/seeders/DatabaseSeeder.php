@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'admin',
             'email' => 'admin@admin.com',
             'password' => 'admin',
+            'role' => 'admin'
         ]);
        $this->call([
         ArtistSeeder::class,

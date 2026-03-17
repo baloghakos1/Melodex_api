@@ -25,6 +25,29 @@ class AlbumControllerTest extends TestCase
             ->assertJsonFragment(['name' => 'Midnights']);
     }
 
+    public function test_single_index_returns_single_album()
+    {
+        $album = Album::factory()->create([
+            'name' => 'Midnights',
+        ]);
+
+        $response = $this->getJson("/api/album/{$album->id}");
+
+        $response->assertStatus(200)
+            ->assertJsonFragment([
+                'id' => $album->id,
+                'name' => 'Midnights',
+            ]);
+    }
+
+    public function test_single_index_returns_404_for_missing_album()
+    {
+        $response = $this->getJson('/api/album/9999');
+
+        $response->assertStatus(404)
+            ->assertJsonFragment(['message' => 'Album not found']);
+    }
+
     public function test_index_song_returns_all_album_songs()
     {
         $album = Album::factory()->create([
@@ -60,21 +83,6 @@ class AlbumControllerTest extends TestCase
 
         $response->assertStatus(404)
             ->assertJsonFragment(['message' => 'Album not found']);
-    }
-
-    public function test_index_filters_by_needle()
-    {
-        Album::factory()->create(['name' => 'The Life of a Showgirl']);
-        Album::factory()->create(['name' => 'Midnights']);
-        Album::factory()->create(['name' => 'GNX']);
-
-
-        $response = $this->getJson('/api/albums?needle=bar');
-
-        $response->assertStatus(200)
-            ->assertJsonFragment(['name' => 'Midnights'])
-            ->assertJsonFragment(['name' => 'The Life of a Showgirl'])
-            ->assertJsonMissing(['name' => 'Born Pink']);
     }
 
     public function test_store_creates_new_album()

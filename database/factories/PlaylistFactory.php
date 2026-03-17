@@ -2,18 +2,19 @@
 
 namespace Database\Factories;
 
-use App\Models\Artist;
+use App\Models\Playlist;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Artist>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Playlist>
  */
-class ArtistFactory extends Factory
+class PlaylistFactory extends Factory
 {
 
     use RefreshDatabase;
-    protected $model = Artist::class;
+    protected $model = Playlist::class;
     /**
      * Define the model's default state.
      *
@@ -23,7 +24,7 @@ class ArtistFactory extends Factory
 	{
 		return [
 			'name' => $this->faker->unique()->word(),
-            'nationality' => $this->faker->unique()->word(),
+            'user_id' => User::factory()
 		];
 	}
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserApiController extends Controller
 {
@@ -44,5 +45,229 @@ class UserApiController extends Controller
         return response()->json([
             'users' => $users,
         ]);
+    }
+
+    public function index_playlist(Request $request, $id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        return response()->json([
+            'user' => $user->name,
+            'playlists' => $user->playlists
+        ]);
+
+    }
+
+    public function single_index_playlist($user_id, $id)
+    {
+        $user = User::find($user_id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $playlist = $user->playlists()->find($id);
+
+        if (!$playlist) {
+            return response()->json(['message' => 'Playlist not found'], 404);
+        }
+        return response()->json([
+            'user' => $user->name,
+            'playlist' => $playlist
+        ]);
+    }
+
+    public function index_playlist_song(Request $request, $user_id, $id)
+    {
+        $user = User::find($user_id);
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found'
+            ], 404);
+        }
+
+        $playlist = $user->playlists()
+            ->with('songs.album.artist')
+            ->find($id);
+
+        if (!$playlist) {
+            return response()->json([
+                'message' => 'Playlist not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'user' => $user->name,
+            'playlist' => $playlist->name,
+            'songs' => $playlist->songs
+        ]);
+    }
+
+
+    public function store_playlist(Request $request, $id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:100',
+        ]);
+
+        $existing = $user->playlists()
+            ->where('name', $request->name)
+            ->first();
+
+        if ($existing) {
+            return response()->json([
+                'message' => 'Playlist with this name already exists'
+            ], 409);
+        }
+
+        $playlist = $user->playlists()->create([
+            'name' => $request->name,
+        ]);
+
+        return response()->json([
+            'message' => 'Playlist created successfully',
+            'playlist' => $playlist
+        ], 201);
+    }
+
+    public function store_playlist_song(Request $request, $user_id, $id)
+    {
+        $user = User::find($user_id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $playlist = $user->playlists()->find($id);
+
+        if (!$playlist) {
+            return response()->json(['message' => 'Playlist not found'], 404);
+        }
+
+        $request->validate([
+            'song_id' => 'required|exists:songs,id'
+        ]);
+
+        $songId = $request->song_id;
+
+        $alreadyExists = $playlist->songs()
+            ->where('songs.id', $songId)
+            ->exists();
+
+        if ($alreadyExists) {
+            return response()->json([
+                'message' => 'Song already exists in playlist'
+            ], 409);
+        }
+
+        $playlist->songs()->attach($songId);
+
+        return response()->json([
+            'message' => 'Song added successfully'
+        ], 201);
+    }
+
+
+    public function update_playlist(Request $request, $user_id, $id)
+    {
+        $user = User::find($user_id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $playlist = $user->playlists()->find($id);
+
+        if (!$playlist) {
+            return response()->json(['message' => 'Playlist not found'], 404);
+        }
+
+        $request->validate([
+            'name' => 'nullable|string|max:100',
+        ]);
+
+        $newName = $request->name ?? $playlist->name;
+
+        $alreadyExists = $user->playlists()
+            ->where('name', $newName)
+            ->where('id', '!=', $playlist->id)
+            ->exists();
+
+        if ($alreadyExists) {
+            return response()->json([
+                'message' => 'Playlist with this name already exists'
+            ], 409);
+        }
+
+        $playlist->update([
+            'name' => $newName
+        ]);
+
+        return response()->json([
+            'message' => 'Playlist updated successfully',
+            'playlist' => $playlist
+        ], 200);
+    }
+
+    public function destroy_playlist($user_id, $id)
+    {
+        $user = User::find($user_id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+
+        $playlist = $user->playlists()->find($id);
+
+        if (!$playlist) {
+            return response()->json(['message' => 'Playlist not found'], 404);
+        }
+
+        $playlist->delete();
+
+        return response()->json(['message' => 'Playlist deleted successfully', 'id' => $id], 410);
+    }
+
+    public function destroy_playlist_song($user_id, $playlist_id, $id)
+    {
+        $user = User::find($user_id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+
+        $playlist = $user->playlists()->find($playlist_id);
+
+        if (!$playlist) {
+            return response()->json(['message' => 'Playlist not found'], 404);
+        }
+
+        $pivot = $playlist->songs()
+            ->wherePivot('id', $id)
+            ->first();
+
+        if (!$pivot) {
+            return response()->json(['message' => 'Song not found in playlist'], 404);
+        }
+
+        $playlist->songs()->detach($pivot->id);
+
+        return response()->json([
+            'message' => 'Song removed from playlist',
+            'id' => $id
+        ], 200);
     }
 }
