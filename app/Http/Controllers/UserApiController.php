@@ -256,7 +256,7 @@ class UserApiController extends Controller
         }
 
         $pivot = $playlist->songs()
-            ->wherePivot('id', $id)
+            ->wherePivot('song_id', $id)
             ->first();
 
         if (!$pivot) {
