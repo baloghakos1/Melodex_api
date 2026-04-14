@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\User;
+use App\Models\Song;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -161,18 +162,55 @@ class UserApiController extends Controller
             ->pluck('id')
             ->toArray();
 
-        foreach ($user->playlists as $playlist) {
-            $playlist->songs()->detach($song_id);
+        $song = Song::findOrFail($song_id);
+
+        $song->playlists()->sync($validPlaylistIds);
+
+        return response()->json([
+            'message' => 'Playlists updated successfully'
+        ]);
+    }
+
+    public function store_playlist_song(Request $request, $user_id, $id)
+    {
+        $user = User::find($user_id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
         }
 
-        foreach ($validPlaylistIds as $playlistId) {
-            $playlist = $user->playlists()->find($playlistId);
-            $playlist->songs()->attach($song_id);
+        $playlist = $user->playlists()->find($id);
+
+        if (!$playlist) {
+            return response()->json(['message' => 'Playlist not found'], 404);
         }
+
+        $request->validate([
+            'song_id' => 'required|exists:songs,id'
+
+        ]);
+
+        $songId = $request->song_id;
+
+        $alreadyExists = $playlist->songs()
+            ->where('songs.id', $songId)
+            ->exists();
+
+
+        if ($alreadyExists) {
+            return response()->json([
+                'message' => 'Song already exists in playlist'
+            ], 409);
+        }
+
+        $playlist->songs()->attach($songId);
+
+
+
 
         return response()->json([
             'message' => 'Song added successfully'
-        ]);
+        ], 201);
     }
 
 
