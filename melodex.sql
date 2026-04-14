@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Apr 14, 2026 at 01:32 PM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Gép: 127.0.0.1
+-- Létrehozás ideje: 2026. Ápr 14. 14:09
+-- Kiszolgáló verziója: 10.4.32-MariaDB
+-- PHP verzió: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,15 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `melodex`
+-- Adatbázis: `melodex`
 --
+CREATE DATABASE IF NOT EXISTS `melodex` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `melodex`;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `albums`
+-- Tábla szerkezet ehhez a táblához `albums`
 --
 
 CREATE TABLE `albums` (
@@ -37,7 +39,7 @@ CREATE TABLE `albums` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `albums`
+-- A tábla adatainak kiíratása `albums`
 --
 
 INSERT INTO `albums` (`id`, `name`, `cover`, `year`, `genre`, `artist_id`) VALUES
@@ -998,7 +1000,7 @@ INSERT INTO `albums` (`id`, `name`, `cover`, `year`, `genre`, `artist_id`) VALUE
 -- --------------------------------------------------------
 
 --
--- Table structure for table `artists`
+-- Tábla szerkezet ehhez a táblához `artists`
 --
 
 CREATE TABLE `artists` (
@@ -1010,7 +1012,7 @@ CREATE TABLE `artists` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `artists`
+-- A tábla adatainak kiíratása `artists`
 --
 
 INSERT INTO `artists` (`id`, `name`, `nationality`, `image`, `description`) VALUES
@@ -1056,7 +1058,19 @@ INSERT INTO `artists` (`id`, `name`, `nationality`, `image`, `description`) VALU
 -- --------------------------------------------------------
 
 --
--- Table structure for table `songs`
+-- Tábla szerkezet ehhez a táblához `playlists`
+--
+
+CREATE TABLE `playlists` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `user_id` bigint(20) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tábla szerkezet ehhez a táblához `songs`
 --
 
 CREATE TABLE `songs` (
@@ -1068,7 +1082,7 @@ CREATE TABLE `songs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `songs`
+-- A tábla adatainak kiíratása `songs`
 --
 
 INSERT INTO `songs` (`id`, `name`, `lyrics`, `album_id`, `stream_url`) VALUES
@@ -2044,7 +2058,19 @@ INSERT INTO `songs` (`id`, `name`, `lyrics`, `album_id`, `stream_url`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Tábla szerkezet ehhez a táblához `songs_playlists`
+--
+
+CREATE TABLE `songs_playlists` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `playlist_id` bigint(20) UNSIGNED NOT NULL,
+  `song_id` bigint(20) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tábla szerkezet ehhez a táblához `users`
 --
 
 CREATE TABLE `users` (
@@ -2059,86 +2085,126 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `users`
+-- A tábla adatainak kiíratása `users`
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
 (1, 'admin', 'admin@admin.admin', NULL, '$2y$12$1XbOU8Zd9dI6EcENg7ZkKeUji67t27vpfnDUHg4VrS85yJBzsrHEm', NULL, '2026-02-23 12:15:01', '2026-02-23 12:15:01');
 
 --
--- Indexes for dumped tables
+-- Indexek a kiírt táblákhoz
 --
 
 --
--- Indexes for table `albums`
+-- A tábla indexei `albums`
 --
 ALTER TABLE `albums`
   ADD PRIMARY KEY (`id`),
   ADD KEY `albums_artist_id_foreign` (`artist_id`);
 
 --
--- Indexes for table `artists`
+-- A tábla indexei `artists`
 --
 ALTER TABLE `artists`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `songs`
+-- A tábla indexei `playlists`
+--
+ALTER TABLE `playlists`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `playlists_user_id_foreign` (`user_id`);
+
+--
+-- A tábla indexei `songs`
 --
 ALTER TABLE `songs`
   ADD PRIMARY KEY (`id`),
   ADD KEY `songs_album_id_foreign` (`album_id`);
 
 --
--- Indexes for table `users`
+-- A tábla indexei `songs_playlists`
+--
+ALTER TABLE `songs_playlists`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `songs_playlists_playlist_id_foreign` (`playlist_id`),
+  ADD KEY `songs_playlists_song_id_foreign` (`song_id`);
+
+--
+-- A tábla indexei `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `users_email_unique` (`email`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- A kiírt táblák AUTO_INCREMENT értéke
 --
 
 --
--- AUTO_INCREMENT for table `albums`
+-- AUTO_INCREMENT a táblához `albums`
 --
 ALTER TABLE `albums`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1174;
 
 --
--- AUTO_INCREMENT for table `artists`
+-- AUTO_INCREMENT a táblához `artists`
 --
 ALTER TABLE `artists`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
--- AUTO_INCREMENT for table `songs`
+-- AUTO_INCREMENT a táblához `playlists`
+--
+ALTER TABLE `playlists`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT a táblához `songs`
 --
 ALTER TABLE `songs`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=965;
 
 --
--- AUTO_INCREMENT for table `users`
+-- AUTO_INCREMENT a táblához `songs_playlists`
+--
+ALTER TABLE `songs_playlists`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT a táblához `users`
 --
 ALTER TABLE `users`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- Constraints for dumped tables
+-- Megkötések a kiírt táblákhoz
 --
 
 --
--- Constraints for table `albums`
+-- Megkötések a táblához `albums`
 --
 ALTER TABLE `albums`
   ADD CONSTRAINT `albums_artist_id_foreign` FOREIGN KEY (`artist_id`) REFERENCES `artists` (`id`);
 
 --
--- Constraints for table `songs`
+-- Megkötések a táblához `playlists`
+--
+ALTER TABLE `playlists`
+  ADD CONSTRAINT `playlists_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Megkötések a táblához `songs`
 --
 ALTER TABLE `songs`
   ADD CONSTRAINT `songs_album_id_foreign` FOREIGN KEY (`album_id`) REFERENCES `albums` (`id`);
+
+--
+-- Megkötések a táblához `songs_playlists`
+--
+ALTER TABLE `songs_playlists`
+  ADD CONSTRAINT `songs_playlists_playlist_id_foreign` FOREIGN KEY (`playlist_id`) REFERENCES `playlists` (`id`),
+  ADD CONSTRAINT `songs_playlists_song_id_foreign` FOREIGN KEY (`song_id`) REFERENCES `songs` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
