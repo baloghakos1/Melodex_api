@@ -141,7 +141,7 @@ class UserApiController extends Controller
         ], 201);
     }
 
-    public function store_playlist_song(Request $request, $user_id, $id)
+    public function store_song_playlists(Request $request, $user_id, $song_id)
     {
         $user = User::find($user_id);
 
@@ -149,33 +149,30 @@ class UserApiController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        $playlist = $user->playlists()->find($id);
-
-        if (!$playlist) {
-            return response()->json(['message' => 'Playlist not found'], 404);
-        }
-
         $request->validate([
-            'song_id' => 'required|exists:songs,id'
+            'playlists' => 'array',
+            'playlists.*' => 'exists:playlists,id'
         ]);
 
-        $songId = $request->song_id;
+        $playlistIds = $request->playlists ?? [];
 
-        $alreadyExists = $playlist->songs()
-            ->where('songs.id', $songId)
-            ->exists();
+        $validPlaylistIds = $user->playlists()
+            ->whereIn('id', $playlistIds)
+            ->pluck('id')
+            ->toArray();
 
-        if ($alreadyExists) {
-            return response()->json([
-                'message' => 'Song already exists in playlist'
-            ], 409);
+        foreach ($user->playlists as $playlist) {
+            $playlist->songs()->detach($song_id);
         }
 
-        $playlist->songs()->attach($songId);
+        foreach ($validPlaylistIds as $playlistId) {
+            $playlist = $user->playlists()->find($playlistId);
+            $playlist->songs()->attach($song_id);
+        }
 
         return response()->json([
             'message' => 'Song added successfully'
-        ], 201);
+        ]);
     }
 
 
@@ -269,5 +266,27 @@ class UserApiController extends Controller
             'message' => 'Song removed from playlist',
             'id' => $id
         ], 200);
+    }
+
+    public function song_playlists($user_id, $song_id)
+    {
+        $user = User::find($user_id);
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found'
+            ], 404);
+        }
+
+        $playlists = $user->playlists()
+            ->whereHas('songs', function ($query) use ($song_id) {
+                $query->where('songs.id', $song_id);
+            })
+            ->get(['id', 'name']);
+
+        return response()->json([
+            'song_id' => $song_id,
+            'playlists' => $playlists
+        ]);
     }
 }
