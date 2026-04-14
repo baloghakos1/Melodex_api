@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\User;
+use App\Models\Song;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -141,6 +142,35 @@ class UserApiController extends Controller
         ], 201);
     }
 
+    public function store_song_playlists(Request $request, $user_id, $song_id)
+    {
+        $user = User::find($user_id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $request->validate([
+            'playlists' => 'array',
+            'playlists.*' => 'exists:playlists,id'
+        ]);
+
+        $playlistIds = $request->playlists ?? [];
+
+        $validPlaylistIds = $user->playlists()
+            ->whereIn('id', $playlistIds)
+            ->pluck('id')
+            ->toArray();
+
+        $song = Song::findOrFail($song_id);
+
+        $song->playlists()->sync($validPlaylistIds);
+
+        return response()->json([
+            'message' => 'Playlists updated successfully'
+        ]);
+    }
+
     public function store_playlist_song(Request $request, $user_id, $id)
     {
         $user = User::find($user_id);
@@ -157,6 +187,7 @@ class UserApiController extends Controller
 
         $request->validate([
             'song_id' => 'required|exists:songs,id'
+
         ]);
 
         $songId = $request->song_id;
@@ -165,6 +196,7 @@ class UserApiController extends Controller
             ->where('songs.id', $songId)
             ->exists();
 
+
         if ($alreadyExists) {
             return response()->json([
                 'message' => 'Song already exists in playlist'
@@ -172,6 +204,9 @@ class UserApiController extends Controller
         }
 
         $playlist->songs()->attach($songId);
+
+
+
 
         return response()->json([
             'message' => 'Song added successfully'
@@ -256,7 +291,7 @@ class UserApiController extends Controller
         }
 
         $pivot = $playlist->songs()
-            ->wherePivot('id', $id)
+            ->wherePivot('song_id', $id)
             ->first();
 
         if (!$pivot) {
@@ -269,5 +304,27 @@ class UserApiController extends Controller
             'message' => 'Song removed from playlist',
             'id' => $id
         ], 200);
+    }
+
+    public function song_playlists($user_id, $song_id)
+    {
+        $user = User::find($user_id);
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found'
+            ], 404);
+        }
+
+        $playlists = $user->playlists()
+            ->whereHas('songs', function ($query) use ($song_id) {
+                $query->where('songs.id', $song_id);
+            })
+            ->get(['id', 'name']);
+
+        return response()->json([
+            'song_id' => $song_id,
+            'playlists' => $playlists
+        ]);
     }
 }

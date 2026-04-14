@@ -353,6 +353,127 @@ class UserControllerTest extends TestCase {
             ->assertJsonFragment(['message' => 'Playlist not found']);
     }
 
+    public function test_store_song_playlists_syncs_playlists_successfully()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+
+        $song = Song::factory()->create();
+
+        $playlist1 = Playlist::factory()->create(['user_id' => $user->id]);
+        $playlist2 = Playlist::factory()->create(['user_id' => $user->id]);
+
+        $song->playlists()->attach($playlist1->id);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->postJson("/api/user/{$user->id}/song/{$song->id}/playlists", [
+            'playlists' => [$playlist2->id],
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonFragment([
+                'message' => 'Playlists updated successfully'
+            ]);
+
+        $this->assertDatabaseHas('songs_playlists', [
+            'song_id' => $song->id,
+            'playlist_id' => $playlist2->id,
+        ]);
+
+        $this->assertDatabaseMissing('songs_playlists', [
+            'song_id' => $song->id,
+            'playlist_id' => $playlist1->id,
+        ]);
+    }
+
+    public function test_store_song_playlists_returns_404_for_missing_user()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+
+        $song = Song::factory()->create();
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->postJson("/api/user/9999/song/{$song->id}/playlists", [
+            'playlists' => [],
+        ]);
+
+        $response->assertStatus(404)
+            ->assertJsonFragment([
+                'message' => 'User not found'
+            ]);
+    }
+
+    public function test_store_song_playlists_ignores_invalid_playlists()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+
+        $song = Song::factory()->create();
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->postJson("/api/user/{$user->id}/song/{$song->id}/playlists", [
+            'playlists' => [999999],
+        ]);
+        
+        $response->assertStatus(422);
+
+        $this->assertDatabaseMissing('songs_playlists', [
+            'song_id' => $song->id,
+        ]);
+    }
+
+    public function test_song_playlists_returns_playlists_containing_song()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+
+        $song = Song::factory()->create();
+
+        $playlist1 = Playlist::factory()->create(['user_id' => $user->id]);
+        $playlist2 = Playlist::factory()->create(['user_id' => $user->id]);
+
+        $playlist1->songs()->attach($song->id);
+        $playlist2->songs()->attach($song->id);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->getJson("/api/user/{$user->id}/song/{$song->id}/playlists");
+
+        $response->assertStatus(200)
+            ->assertJsonFragment([
+                'song_id' => (string) $song->id,
+            ])
+            ->assertJsonFragment([
+                'id' => $playlist1->id,
+            ])
+            ->assertJsonFragment([
+                'id' => $playlist2->id,
+            ]);
+    }
+
+    public function test_song_playlists_returns_404_if_user_not_found()
+    {
+        $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
+
+        $song = Song::factory()->create();
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->getJson("/api/user/9999/song/{$song->id}/playlists");
+
+        $response->assertStatus(404)
+            ->assertJsonFragment([
+                'message' => 'User not found'
+            ]);
+    }
+
+
+
     public function test_update_playlist_modifies_existing_playlist() {
         $user = User::factory()->create();
         $playlist = Playlist::factory()->create([
